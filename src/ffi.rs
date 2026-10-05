@@ -5,7 +5,6 @@
 use core::ffi::{c_int, c_void};
 
 unsafe extern "C" {
-    #[allow(dead_code)]
     pub(crate) fn flash_attn_rocm_fwd(
         q_ptr: *const c_void,
         k_ptr: *const c_void,
