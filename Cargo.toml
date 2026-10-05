@@ -1,0 +1,15 @@
+[package]
+name = "candle-flash-attn-rocm"
+version = "0.1.0"
+edition = "2024"
+
+description = "FlashAttention for ROCm GPUs via AMD's Composable Kernel (CK), for the candle ML framework."
+license = "MIT OR Apache-2.0"
+
+[dependencies]
+# TODO: Pin to a specific candle-core version/fork with ROCm support.
+# candle-core = { version = "...", features = ["cuda"] }
+half = { version = "2.3.1", features = ["num-traits"] }
+
+[build-dependencies]
+anyhow = { version = "1", features = ["backtrace"] }
