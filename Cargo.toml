@@ -14,3 +14,9 @@ half = { version = "2.3.1", features = ["num-traits"] }
 
 [build-dependencies]
 anyhow = { version = "1", features = ["backtrace"] }
+
+[dev-dependencies]
+anyhow = { version = "1", features = ["backtrace"] }
+candle-nn = { git = "https://github.com/xmiksay/candle", branch = "feat/rocm-backend", features = [
+    "rocm",
+] }

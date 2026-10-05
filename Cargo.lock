@@ -159,7 +159,24 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "candle-core",
+ "candle-nn",
  "half",
+]
+
+[[package]]
+name = "candle-nn"
+version = "0.11.0"
+source = "git+https://github.com/xmiksay/candle?branch=feat%2Frocm-backend#fca7197d2853451172df7bfbce95bc3cc6f0dcc1"
+dependencies = [
+ "candle-core",
+ "candle-rocm-kernels",
+ "half",
+ "libc",
+ "num-traits",
+ "rayon",
+ "safetensors",
+ "serde",
+ "thiserror 2.0.21",
 ]
 
 [[package]]
