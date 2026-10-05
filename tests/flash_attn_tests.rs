@@ -85,6 +85,108 @@ fn max_abs_diff(a: &Tensor, b: &Tensor) -> Result<f32> {
     Ok(diff.to_vec0::<f32>()?)
 }
 
+/// Rank-3 variant of [`bounded_tensor`] for packed `(total_tokens, heads,
+/// head_dim)` varlen tensors.
+fn bounded_tensor_3d(
+    shape: (usize, usize, usize),
+    modulus: usize,
+    device: &Device,
+    dtype: DType,
+) -> Result<Tensor> {
+    let elem_count = shape.0 * shape.1 * shape.2;
+    let half = modulus as f32 / 2.0;
+    let data: Vec<f32> = (0..elem_count)
+        .map(|i| ((i % modulus) as f32 - half) / half)
+        .collect();
+    Ok(Tensor::from_vec(data, shape, device)?.to_dtype(dtype)?)
+}
+
+/// Builds a `(lengths.len() + 1,)` `U32` cumulative-sum tensor, e.g.
+/// `[3, 4]` -> `[0, 3, 7]`.
+fn cu_seqlens_from_lengths(lengths: &[usize], device: &Device) -> Result<Tensor> {
+    let mut data = Vec::with_capacity(lengths.len() + 1);
+    let mut acc: u32 = 0;
+    data.push(acc);
+    for &len in lengths {
+        acc += u32::try_from(len).expect("sequence length overflows u32");
+        data.push(acc);
+    }
+    Ok(Tensor::from_vec(data, (lengths.len() + 1,), device)?)
+}
+
+/// Naive varlen SDPA: unpacks each sequence from the packed `(total, heads,
+/// head_dim)` buffers, runs [`naive_sdpa`] on it as a batch-of-1, and
+/// re-concatenates the outputs along dim 0.
+fn naive_varlen_sdpa(
+    q: &Tensor,
+    k: &Tensor,
+    v: &Tensor,
+    seqlens_q: &[usize],
+    seqlens_k: &[usize],
+    softmax_scale: f32,
+    causal: bool,
+) -> Result<Tensor> {
+    let mut outputs = Vec::with_capacity(seqlens_q.len());
+    let mut q_offset = 0;
+    let mut k_offset = 0;
+    for (&len_q, &len_k) in seqlens_q.iter().zip(seqlens_k.iter()) {
+        let q_seq = q.narrow(0, q_offset, len_q)?.unsqueeze(0)?;
+        let k_seq = k.narrow(0, k_offset, len_k)?.unsqueeze(0)?;
+        let v_seq = v.narrow(0, k_offset, len_k)?.unsqueeze(0)?;
+        let out = naive_sdpa(&q_seq, &k_seq, &v_seq, softmax_scale, causal)?;
+        outputs.push(out.squeeze(0)?);
+        q_offset += len_q;
+        k_offset += len_k;
+    }
+    Ok(Tensor::cat(&outputs, 0)?)
+}
+
+#[allow(clippy::too_many_arguments)]
+fn run_varlen_test(
+    seqlen_pairs: &[(usize, usize)],
+    heads_q: usize,
+    heads_kv: usize,
+    head_dim: usize,
+    dtype: DType,
+    causal: bool,
+    tol: f32,
+) -> Result<()> {
+    let device = Device::new_rocm(0)?;
+    let seqlens_q: Vec<usize> = seqlen_pairs.iter().map(|&(q, _)| q).collect();
+    let seqlens_k: Vec<usize> = seqlen_pairs.iter().map(|&(_, k)| k).collect();
+    let total_q: usize = seqlens_q.iter().sum();
+    let total_k: usize = seqlens_k.iter().sum();
+    let max_seqlen_q = *seqlens_q.iter().max().expect("non-empty seqlen_pairs");
+    let max_seqlen_k = *seqlens_k.iter().max().expect("non-empty seqlen_pairs");
+
+    let q = bounded_tensor_3d((total_q, heads_q, head_dim), 251, &device, dtype)?;
+    let k = bounded_tensor_3d((total_k, heads_kv, head_dim), 193, &device, dtype)?;
+    let v = bounded_tensor_3d((total_k, heads_kv, head_dim), 157, &device, dtype)?;
+
+    let cu_seqlens_q = cu_seqlens_from_lengths(&seqlens_q, &device)?;
+    let cu_seqlens_k = cu_seqlens_from_lengths(&seqlens_k, &device)?;
+
+    let softmax_scale = 1.0 / (head_dim as f32).sqrt();
+    let expected = naive_varlen_sdpa(&q, &k, &v, &seqlens_q, &seqlens_k, softmax_scale, causal)?;
+    let actual = candle_flash_attn_rocm::flash_attn_varlen(
+        &q,
+        &k,
+        &v,
+        &cu_seqlens_q,
+        &cu_seqlens_k,
+        max_seqlen_q,
+        max_seqlen_k,
+        softmax_scale,
+        causal,
+    )?;
+
+    assert_eq!(actual.dims(), &[total_q, heads_q, head_dim]);
+
+    let diff = max_abs_diff(&expected, &actual)?;
+    assert!(diff < tol, "max abs diff {diff} exceeds tolerance {tol}");
+    Ok(())
+}
+
 #[allow(clippy::too_many_arguments)]
 fn run_test(
     batch: usize,
@@ -153,4 +255,56 @@ fn test_gqa_causal_bf16() -> Result<()> {
 #[test]
 fn test_medium_seqlen() -> Result<()> {
     run_test(1, 256, 256, 4, 4, 128, DType::F16, true, 1e-2)
+}
+
+/// Varlen, equal-length sequences, non-causal, F16.
+#[test]
+fn test_varlen_equal_lengths_non_causal_f16() -> Result<()> {
+    run_varlen_test(&[(32, 32), (32, 32)], 4, 4, 128, DType::F16, false, 1e-2)
+}
+
+/// Varlen, equal-length sequences, causal, F16.
+#[test]
+fn test_varlen_equal_lengths_causal_f16() -> Result<()> {
+    run_varlen_test(&[(32, 32), (32, 32)], 4, 4, 128, DType::F16, true, 1e-2)
+}
+
+/// Varlen, differing sequence lengths, causal, F16.
+#[test]
+fn test_varlen_varying_lengths_causal_f16() -> Result<()> {
+    run_varlen_test(
+        &[(16, 16), (48, 48), (8, 8)],
+        4,
+        4,
+        128,
+        DType::F16,
+        true,
+        1e-2,
+    )
+}
+
+/// Varlen, differing sequence lengths, causal, BF16.
+#[test]
+fn test_varlen_varying_lengths_causal_bf16() -> Result<()> {
+    run_varlen_test(
+        &[(16, 16), (48, 48), (8, 8)],
+        4,
+        4,
+        128,
+        DType::BF16,
+        true,
+        5e-2,
+    )
+}
+
+/// Varlen, GQA (8 query heads : 2 kv heads) with differing lengths, causal, F16.
+#[test]
+fn test_varlen_gqa_causal_f16() -> Result<()> {
+    run_varlen_test(&[(24, 24), (40, 40)], 8, 2, 128, DType::F16, true, 1e-2)
+}
+
+/// Varlen, single sequence (batch = 1), causal, F16.
+#[test]
+fn test_varlen_single_sequence_causal_f16() -> Result<()> {
+    run_varlen_test(&[(64, 64)], 4, 4, 128, DType::F16, true, 1e-2)
 }

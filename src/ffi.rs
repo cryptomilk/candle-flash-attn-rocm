@@ -43,4 +43,43 @@ unsafe extern "C" {
 
         stream: *mut c_void,
     ) -> c_int;
+
+    pub(crate) fn flash_attn_rocm_varlen_fwd(
+        q_ptr: *const c_void,
+        k_ptr: *const c_void,
+        v_ptr: *const c_void,
+        out_ptr: *mut c_void,
+        softmax_lse_ptr: *mut c_void,
+
+        cu_seqlens_q: *const i32,
+        cu_seqlens_k: *const i32,
+
+        q_row_stride: i32,
+        k_row_stride: i32,
+        v_row_stride: i32,
+        o_row_stride: i32,
+
+        q_head_stride: i32,
+        k_head_stride: i32,
+        v_head_stride: i32,
+        o_head_stride: i32,
+
+        batch: i32,
+        total_q: i32,
+        total_k: i32,
+        max_seqlen_q: i32,
+        max_seqlen_k: i32,
+        num_heads: i32,
+        num_heads_k: i32,
+        head_size: i32,
+
+        softmax_scale: f32,
+
+        is_causal: c_int,
+        window_size_left: c_int,
+        window_size_right: c_int,
+        is_bf16: c_int,
+
+        stream: *mut c_void,
+    ) -> c_int;
 }
