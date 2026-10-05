@@ -13,9 +13,12 @@ Vendored:
 Intentionally skipped (not needed for inference, or PyTorch-specific):
 - `flash_api.cpp` (pybind11 module)
 - `mha_bwd.cpp`, `mha_varlen_bwd.cpp` (backward pass)
+- `mha_varlen_fwd.cpp` — the varlen forward path was reimplemented directly
+  in `kernels/flash_attn_shim.cpp` against `fmha_fwd.hpp`/
+  `fmha_fwd_head_grouping.hpp` instead of vendoring this file
 
-`mha_varlen_fwd.cpp` and `mha_fwd_kvcache.cpp` will be added in a later
-commit when the varlen/KV-cache API lands.
+`mha_fwd_kvcache.cpp` will be added in a later commit when the KV-cache API
+lands.
 
 These files still depend on PyTorch's `at::Tensor` and pybind11; a later
 commit replaces that glue with a C-ABI shim while keeping the CK dispatch
