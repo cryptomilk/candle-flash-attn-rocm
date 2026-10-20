@@ -21,7 +21,7 @@ const SHIM_HEADER: &str = "kernels/flash_attn_shim.h";
 const GENERATED_DIR: &str = "kernels/generated";
 const CK_INCLUDE: &str = "composable_kernel/include";
 const CK_FMHA_INCLUDE: &str = "composable_kernel/example/ck_tile/01_fmha";
-const DEFAULT_ARCHES: &str = "gfx90a,gfx1100";
+const DEFAULT_ARCHES: &str = "gfx90a,gfx1100,gfx1200,gfx1201";
 const LIB_NAME: &str = "flashattention_rocm";
 
 fn main() -> Result<()> {
@@ -122,8 +122,8 @@ fn which_on_path(name: &str) -> Option<PathBuf> {
 }
 
 /// `ROCM_TARGET_ARCH` (comma-separated) takes priority, then `rocminfo`
-/// auto-detection, then a default covering the vendored gfx9/gfx11-family
-/// instantiations.
+/// auto-detection, then a default covering the vendored gfx9/gfx11/gfx12
+/// family instantiations.
 fn resolve_archs(rocm_path: Option<&Path>) -> Vec<String> {
     if let Ok(archs) = env::var("ROCM_TARGET_ARCH") {
         let archs: Vec<String> = archs

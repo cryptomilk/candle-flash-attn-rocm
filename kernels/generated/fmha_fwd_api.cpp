@@ -311,6 +311,341 @@ float fmha_fwd_v2([[maybe_unused]] fmha_fwd_traits t, [[maybe_unused]] fmha_fwd_
         }
 
     }
+    else if(device_name.compare(0, 5, "gfx12") == 0) {
+        if(t.data_type.compare("fp16") == 0) {
+            if(t.hdim_q <= 128 && t.hdim_v <= 128) {
+                if((t.is_group_mode == false) && (t.is_v_rowmajor == true) && (t.has_logits_soft_cap == false) && (t.mask_type == mask_enum::no_mask) && (t.bias_type == bias_enum::no_bias) && (t.has_lse == true)  && (t.has_dropout == false) && (t.qscale_type == quant_scale_enum::no_scale) && (t.skip_min_seqlen_q == false) &&(t.has_sink == false) &&
+                        (true /*a.seqlen_q % 64 != 0*/) && (true/*fall back to largest tile*/) && (true /*a.seqlen_k % 64 != 0*/) && (a.hdim_q % 128 == 0) && (a.hdim_v % 128 == 0) && ((a.max_seqlen_q <= 4096) && (true))) {
+                    using trait_ = fmha_fwd_traits_<128, FmhaFwdFp16, false, 64, 64, 32, 128, 32, 128, true, ck_tile::BlockFmhaPipelineEnum::QRKSVS, false, ck_tile::SimplifiedGenericAttentionMask<false>, ck_tile::BlockAttentionBiasEnum::NO_BIAS, true, false, ck_tile::BlockAttentionQuantScaleEnum::NO_SCALE, true, true, false, false, false, false, false>;
+                    return fmha_fwd_<trait_, ck_tile::gfx12_t>(s, a);
+                }
+                else if((t.is_group_mode == false) && (t.is_v_rowmajor == true) && (t.has_logits_soft_cap == false) && (t.mask_type == mask_enum::no_mask) && (t.bias_type == bias_enum::no_bias) && (t.has_lse == true)  && (t.has_dropout == false) && (t.qscale_type == quant_scale_enum::no_scale) && (t.skip_min_seqlen_q == false) &&(t.has_sink == false) &&
+                        (true /*a.seqlen_q % 64 != 0*/) && (true/*fall back to largest tile*/) && (true /*a.seqlen_k % 64 != 0*/) && (a.hdim_q % 8 == 0) && (a.hdim_v % 8 == 0) && ((a.max_seqlen_q <= 4096) && (true))) {
+                    using trait_ = fmha_fwd_traits_<128, FmhaFwdFp16, false, 64, 64, 32, 128, 32, 128, true, ck_tile::BlockFmhaPipelineEnum::QRKSVS_HPAD, false, ck_tile::SimplifiedGenericAttentionMask<false>, ck_tile::BlockAttentionBiasEnum::NO_BIAS, true, false, ck_tile::BlockAttentionQuantScaleEnum::NO_SCALE, true, true, true, true, false, false, false>;
+                    return fmha_fwd_<trait_, ck_tile::gfx12_t>(s, a);
+                }
+                else if((t.is_group_mode == false) && (t.is_v_rowmajor == true) && (t.has_logits_soft_cap == false) && (t.mask_type == mask_enum::no_mask) && (t.bias_type == bias_enum::alibi) && (t.has_lse == true)  && (t.has_dropout == false) && (t.qscale_type == quant_scale_enum::no_scale) && (t.skip_min_seqlen_q == false) &&(t.has_sink == false) &&
+                        (true /*a.seqlen_q % 64 != 0*/) && (true/*fall back to largest tile*/) && (true /*a.seqlen_k % 64 != 0*/) && (a.hdim_q % 128 == 0) && (a.hdim_v % 128 == 0) && ((a.max_seqlen_q <= 4096) && (true))) {
+                    using trait_ = fmha_fwd_traits_<128, FmhaFwdFp16, false, 64, 64, 32, 128, 32, 128, true, ck_tile::BlockFmhaPipelineEnum::QRKSVS, false, ck_tile::SimplifiedGenericAttentionMask<false>, ck_tile::BlockAttentionBiasEnum::ALIBI, true, false, ck_tile::BlockAttentionQuantScaleEnum::NO_SCALE, true, true, false, false, false, false, false>;
+                    return fmha_fwd_<trait_, ck_tile::gfx12_t>(s, a);
+                }
+                else if((t.is_group_mode == false) && (t.is_v_rowmajor == true) && (t.has_logits_soft_cap == false) && (t.mask_type == mask_enum::no_mask) && (t.bias_type == bias_enum::alibi) && (t.has_lse == true)  && (t.has_dropout == false) && (t.qscale_type == quant_scale_enum::no_scale) && (t.skip_min_seqlen_q == false) &&(t.has_sink == false) &&
+                        (true /*a.seqlen_q % 64 != 0*/) && (true/*fall back to largest tile*/) && (true /*a.seqlen_k % 64 != 0*/) && (a.hdim_q % 8 == 0) && (a.hdim_v % 8 == 0) && ((a.max_seqlen_q <= 4096) && (true))) {
+                    using trait_ = fmha_fwd_traits_<128, FmhaFwdFp16, false, 64, 64, 32, 128, 32, 128, true, ck_tile::BlockFmhaPipelineEnum::QRKSVS_HPAD, false, ck_tile::SimplifiedGenericAttentionMask<false>, ck_tile::BlockAttentionBiasEnum::ALIBI, true, false, ck_tile::BlockAttentionQuantScaleEnum::NO_SCALE, true, true, true, true, false, false, false>;
+                    return fmha_fwd_<trait_, ck_tile::gfx12_t>(s, a);
+                }
+                else if((t.is_group_mode == false) && (t.is_v_rowmajor == true) && (t.has_logits_soft_cap == false) && (t.mask_type != mask_enum::no_mask) && (t.bias_type == bias_enum::no_bias) && (t.has_lse == true)  && (t.has_dropout == false) && (t.qscale_type == quant_scale_enum::no_scale) && (t.skip_min_seqlen_q == false) &&(t.has_sink == false) &&
+                        (true /*a.seqlen_q % 64 != 0*/) && (true/*fall back to largest tile*/) && (true /*a.seqlen_k % 64 != 0*/) && (a.hdim_q % 128 == 0) && (a.hdim_v % 128 == 0) && ((a.max_seqlen_q <= 4096) && (true))) {
+                    using trait_ = fmha_fwd_traits_<128, FmhaFwdFp16, false, 64, 64, 32, 128, 32, 128, true, ck_tile::BlockFmhaPipelineEnum::QRKSVS, false, ck_tile::SimplifiedGenericAttentionMask<true>, ck_tile::BlockAttentionBiasEnum::NO_BIAS, true, false, ck_tile::BlockAttentionQuantScaleEnum::NO_SCALE, true, true, false, false, false, false, false>;
+                    return fmha_fwd_<trait_, ck_tile::gfx12_t>(s, a);
+                }
+                else if((t.is_group_mode == false) && (t.is_v_rowmajor == true) && (t.has_logits_soft_cap == false) && (t.mask_type != mask_enum::no_mask) && (t.bias_type == bias_enum::no_bias) && (t.has_lse == true)  && (t.has_dropout == false) && (t.qscale_type == quant_scale_enum::no_scale) && (t.skip_min_seqlen_q == false) &&(t.has_sink == false) &&
+                        (true /*a.seqlen_q % 64 != 0*/) && (true/*fall back to largest tile*/) && (true /*a.seqlen_k % 64 != 0*/) && (a.hdim_q % 8 == 0) && (a.hdim_v % 8 == 0) && ((a.max_seqlen_q <= 4096) && (true))) {
+                    using trait_ = fmha_fwd_traits_<128, FmhaFwdFp16, false, 64, 64, 32, 128, 32, 128, true, ck_tile::BlockFmhaPipelineEnum::QRKSVS_HPAD, false, ck_tile::SimplifiedGenericAttentionMask<true>, ck_tile::BlockAttentionBiasEnum::NO_BIAS, true, false, ck_tile::BlockAttentionQuantScaleEnum::NO_SCALE, true, true, true, true, false, false, false>;
+                    return fmha_fwd_<trait_, ck_tile::gfx12_t>(s, a);
+                }
+                else if((t.is_group_mode == false) && (t.is_v_rowmajor == true) && (t.has_logits_soft_cap == false) && (t.mask_type != mask_enum::no_mask) && (t.bias_type == bias_enum::alibi) && (t.has_lse == true)  && (t.has_dropout == false) && (t.qscale_type == quant_scale_enum::no_scale) && (t.skip_min_seqlen_q == false) &&(t.has_sink == false) &&
+                        (true /*a.seqlen_q % 64 != 0*/) && (true/*fall back to largest tile*/) && (true /*a.seqlen_k % 64 != 0*/) && (a.hdim_q % 128 == 0) && (a.hdim_v % 128 == 0) && ((a.max_seqlen_q <= 4096) && (true))) {
+                    using trait_ = fmha_fwd_traits_<128, FmhaFwdFp16, false, 64, 64, 32, 128, 32, 128, true, ck_tile::BlockFmhaPipelineEnum::QRKSVS, false, ck_tile::SimplifiedGenericAttentionMask<true>, ck_tile::BlockAttentionBiasEnum::ALIBI, true, false, ck_tile::BlockAttentionQuantScaleEnum::NO_SCALE, true, true, false, false, false, false, false>;
+                    return fmha_fwd_<trait_, ck_tile::gfx12_t>(s, a);
+                }
+                else if((t.is_group_mode == false) && (t.is_v_rowmajor == true) && (t.has_logits_soft_cap == false) && (t.mask_type != mask_enum::no_mask) && (t.bias_type == bias_enum::alibi) && (t.has_lse == true)  && (t.has_dropout == false) && (t.qscale_type == quant_scale_enum::no_scale) && (t.skip_min_seqlen_q == false) &&(t.has_sink == false) &&
+                        (true /*a.seqlen_q % 64 != 0*/) && (true/*fall back to largest tile*/) && (true /*a.seqlen_k % 64 != 0*/) && (a.hdim_q % 8 == 0) && (a.hdim_v % 8 == 0) && ((a.max_seqlen_q <= 4096) && (true))) {
+                    using trait_ = fmha_fwd_traits_<128, FmhaFwdFp16, false, 64, 64, 32, 128, 32, 128, true, ck_tile::BlockFmhaPipelineEnum::QRKSVS_HPAD, false, ck_tile::SimplifiedGenericAttentionMask<true>, ck_tile::BlockAttentionBiasEnum::ALIBI, true, false, ck_tile::BlockAttentionQuantScaleEnum::NO_SCALE, true, true, true, true, false, false, false>;
+                    return fmha_fwd_<trait_, ck_tile::gfx12_t>(s, a);
+                }
+                else if((t.is_group_mode == false) && (t.is_v_rowmajor == true) && (t.has_logits_soft_cap == false) && (t.mask_type == mask_enum::no_mask) && (t.bias_type == bias_enum::no_bias) && (t.has_lse == true)  && (t.has_dropout == false) && (t.qscale_type == quant_scale_enum::no_scale) && (t.skip_min_seqlen_q == false) &&(t.has_sink == false) &&
+                        (true /*a.seqlen_q % 128 != 0*/) && (true/*fall back to largest tile*/) && (true /*a.seqlen_k % 64 != 0*/) && (a.hdim_q % 128 == 0) && (a.hdim_v % 128 == 0) && ((true) && (true))) {
+                    using trait_ = fmha_fwd_traits_<128, FmhaFwdFp16, false, 128, 64, 32, 128, 32, 128, true, ck_tile::BlockFmhaPipelineEnum::QRKSVS, false, ck_tile::SimplifiedGenericAttentionMask<false>, ck_tile::BlockAttentionBiasEnum::NO_BIAS, true, false, ck_tile::BlockAttentionQuantScaleEnum::NO_SCALE, true, true, false, false, false, false, false>;
+                    return fmha_fwd_<trait_, ck_tile::gfx12_t>(s, a);
+                }
+                else if((t.is_group_mode == false) && (t.is_v_rowmajor == true) && (t.has_logits_soft_cap == false) && (t.mask_type == mask_enum::no_mask) && (t.bias_type == bias_enum::no_bias) && (t.has_lse == true)  && (t.has_dropout == false) && (t.qscale_type == quant_scale_enum::no_scale) && (t.skip_min_seqlen_q == false) &&(t.has_sink == false) &&
+                        (true /*a.seqlen_q % 128 != 0*/) && (true/*fall back to largest tile*/) && (true /*a.seqlen_k % 64 != 0*/) && (a.hdim_q % 8 == 0) && (a.hdim_v % 8 == 0) && ((true) && (true))) {
+                    using trait_ = fmha_fwd_traits_<128, FmhaFwdFp16, false, 128, 64, 32, 128, 32, 128, true, ck_tile::BlockFmhaPipelineEnum::QRKSVS_HPAD, false, ck_tile::SimplifiedGenericAttentionMask<false>, ck_tile::BlockAttentionBiasEnum::NO_BIAS, true, false, ck_tile::BlockAttentionQuantScaleEnum::NO_SCALE, true, true, true, true, false, false, false>;
+                    return fmha_fwd_<trait_, ck_tile::gfx12_t>(s, a);
+                }
+                else if((t.is_group_mode == false) && (t.is_v_rowmajor == true) && (t.has_logits_soft_cap == false) && (t.mask_type == mask_enum::no_mask) && (t.bias_type == bias_enum::alibi) && (t.has_lse == true)  && (t.has_dropout == false) && (t.qscale_type == quant_scale_enum::no_scale) && (t.skip_min_seqlen_q == false) &&(t.has_sink == false) &&
+                        (true /*a.seqlen_q % 128 != 0*/) && (true/*fall back to largest tile*/) && (true /*a.seqlen_k % 64 != 0*/) && (a.hdim_q % 128 == 0) && (a.hdim_v % 128 == 0) && ((true) && (true))) {
+                    using trait_ = fmha_fwd_traits_<128, FmhaFwdFp16, false, 128, 64, 32, 128, 32, 128, true, ck_tile::BlockFmhaPipelineEnum::QRKSVS, false, ck_tile::SimplifiedGenericAttentionMask<false>, ck_tile::BlockAttentionBiasEnum::ALIBI, true, false, ck_tile::BlockAttentionQuantScaleEnum::NO_SCALE, true, true, false, false, false, false, false>;
+                    return fmha_fwd_<trait_, ck_tile::gfx12_t>(s, a);
+                }
+                else if((t.is_group_mode == false) && (t.is_v_rowmajor == true) && (t.has_logits_soft_cap == false) && (t.mask_type == mask_enum::no_mask) && (t.bias_type == bias_enum::alibi) && (t.has_lse == true)  && (t.has_dropout == false) && (t.qscale_type == quant_scale_enum::no_scale) && (t.skip_min_seqlen_q == false) &&(t.has_sink == false) &&
+                        (true /*a.seqlen_q % 128 != 0*/) && (true/*fall back to largest tile*/) && (true /*a.seqlen_k % 64 != 0*/) && (a.hdim_q % 8 == 0) && (a.hdim_v % 8 == 0) && ((true) && (true))) {
+                    using trait_ = fmha_fwd_traits_<128, FmhaFwdFp16, false, 128, 64, 32, 128, 32, 128, true, ck_tile::BlockFmhaPipelineEnum::QRKSVS_HPAD, false, ck_tile::SimplifiedGenericAttentionMask<false>, ck_tile::BlockAttentionBiasEnum::ALIBI, true, false, ck_tile::BlockAttentionQuantScaleEnum::NO_SCALE, true, true, true, true, false, false, false>;
+                    return fmha_fwd_<trait_, ck_tile::gfx12_t>(s, a);
+                }
+                else if((t.is_group_mode == false) && (t.is_v_rowmajor == true) && (t.has_logits_soft_cap == false) && (t.mask_type != mask_enum::no_mask) && (t.bias_type == bias_enum::no_bias) && (t.has_lse == true)  && (t.has_dropout == false) && (t.qscale_type == quant_scale_enum::no_scale) && (t.skip_min_seqlen_q == false) &&(t.has_sink == false) &&
+                        (true /*a.seqlen_q % 128 != 0*/) && (true/*fall back to largest tile*/) && (true /*a.seqlen_k % 64 != 0*/) && (a.hdim_q % 128 == 0) && (a.hdim_v % 128 == 0) && ((true) && (true))) {
+                    using trait_ = fmha_fwd_traits_<128, FmhaFwdFp16, false, 128, 64, 32, 128, 32, 128, true, ck_tile::BlockFmhaPipelineEnum::QRKSVS, false, ck_tile::SimplifiedGenericAttentionMask<true>, ck_tile::BlockAttentionBiasEnum::NO_BIAS, true, false, ck_tile::BlockAttentionQuantScaleEnum::NO_SCALE, true, true, false, false, false, false, false>;
+                    return fmha_fwd_<trait_, ck_tile::gfx12_t>(s, a);
+                }
+                else if((t.is_group_mode == false) && (t.is_v_rowmajor == true) && (t.has_logits_soft_cap == false) && (t.mask_type != mask_enum::no_mask) && (t.bias_type == bias_enum::no_bias) && (t.has_lse == true)  && (t.has_dropout == false) && (t.qscale_type == quant_scale_enum::no_scale) && (t.skip_min_seqlen_q == false) &&(t.has_sink == false) &&
+                        (true /*a.seqlen_q % 128 != 0*/) && (true/*fall back to largest tile*/) && (true /*a.seqlen_k % 64 != 0*/) && (a.hdim_q % 8 == 0) && (a.hdim_v % 8 == 0) && ((true) && (true))) {
+                    using trait_ = fmha_fwd_traits_<128, FmhaFwdFp16, false, 128, 64, 32, 128, 32, 128, true, ck_tile::BlockFmhaPipelineEnum::QRKSVS_HPAD, false, ck_tile::SimplifiedGenericAttentionMask<true>, ck_tile::BlockAttentionBiasEnum::NO_BIAS, true, false, ck_tile::BlockAttentionQuantScaleEnum::NO_SCALE, true, true, true, true, false, false, false>;
+                    return fmha_fwd_<trait_, ck_tile::gfx12_t>(s, a);
+                }
+                else if((t.is_group_mode == false) && (t.is_v_rowmajor == true) && (t.has_logits_soft_cap == false) && (t.mask_type != mask_enum::no_mask) && (t.bias_type == bias_enum::alibi) && (t.has_lse == true)  && (t.has_dropout == false) && (t.qscale_type == quant_scale_enum::no_scale) && (t.skip_min_seqlen_q == false) &&(t.has_sink == false) &&
+                        (true /*a.seqlen_q % 128 != 0*/) && (true/*fall back to largest tile*/) && (true /*a.seqlen_k % 64 != 0*/) && (a.hdim_q % 128 == 0) && (a.hdim_v % 128 == 0) && ((true) && (true))) {
+                    using trait_ = fmha_fwd_traits_<128, FmhaFwdFp16, false, 128, 64, 32, 128, 32, 128, true, ck_tile::BlockFmhaPipelineEnum::QRKSVS, false, ck_tile::SimplifiedGenericAttentionMask<true>, ck_tile::BlockAttentionBiasEnum::ALIBI, true, false, ck_tile::BlockAttentionQuantScaleEnum::NO_SCALE, true, true, false, false, false, false, false>;
+                    return fmha_fwd_<trait_, ck_tile::gfx12_t>(s, a);
+                }
+                else if((t.is_group_mode == false) && (t.is_v_rowmajor == true) && (t.has_logits_soft_cap == false) && (t.mask_type != mask_enum::no_mask) && (t.bias_type == bias_enum::alibi) && (t.has_lse == true)  && (t.has_dropout == false) && (t.qscale_type == quant_scale_enum::no_scale) && (t.skip_min_seqlen_q == false) &&(t.has_sink == false) &&
+                        (true /*a.seqlen_q % 128 != 0*/) && (true/*fall back to largest tile*/) && (true /*a.seqlen_k % 64 != 0*/) && (a.hdim_q % 8 == 0) && (a.hdim_v % 8 == 0) && ((true) && (true))) {
+                    using trait_ = fmha_fwd_traits_<128, FmhaFwdFp16, false, 128, 64, 32, 128, 32, 128, true, ck_tile::BlockFmhaPipelineEnum::QRKSVS_HPAD, false, ck_tile::SimplifiedGenericAttentionMask<true>, ck_tile::BlockAttentionBiasEnum::ALIBI, true, false, ck_tile::BlockAttentionQuantScaleEnum::NO_SCALE, true, true, true, true, false, false, false>;
+                    return fmha_fwd_<trait_, ck_tile::gfx12_t>(s, a);
+                }
+                else if((t.is_group_mode == true) && (t.is_v_rowmajor == true) && (t.has_logits_soft_cap == false) && (t.mask_type == mask_enum::no_mask) && (t.bias_type == bias_enum::no_bias) && (t.has_lse == true)  && (t.has_dropout == false) && (t.qscale_type == quant_scale_enum::no_scale) && (t.skip_min_seqlen_q == false) &&(t.has_sink == false) &&
+                        (true/*group mode spad always true*/) && (true/*fall back to largest tile*/) && (true/*group mode skpad always true*/) && (a.hdim_q % 128 == 0) && (a.hdim_v % 128 == 0) && ((a.max_seqlen_q <= 4096) && (true))) {
+                    using trait_ = fmha_fwd_traits_<128, FmhaFwdFp16, true, 64, 64, 32, 128, 32, 128, true, ck_tile::BlockFmhaPipelineEnum::QRKSVS, false, ck_tile::SimplifiedGenericAttentionMask<false>, ck_tile::BlockAttentionBiasEnum::NO_BIAS, true, false, ck_tile::BlockAttentionQuantScaleEnum::NO_SCALE, true, true, false, false, false, false, false>;
+                    return fmha_fwd_<trait_, ck_tile::gfx12_t>(s, a);
+                }
+                else if((t.is_group_mode == true) && (t.is_v_rowmajor == true) && (t.has_logits_soft_cap == false) && (t.mask_type == mask_enum::no_mask) && (t.bias_type == bias_enum::no_bias) && (t.has_lse == true)  && (t.has_dropout == false) && (t.qscale_type == quant_scale_enum::no_scale) && (t.skip_min_seqlen_q == false) &&(t.has_sink == false) &&
+                        (true/*group mode spad always true*/) && (true/*fall back to largest tile*/) && (true/*group mode skpad always true*/) && (a.hdim_q % 8 == 0) && (a.hdim_v % 8 == 0) && ((a.max_seqlen_q <= 4096) && (true))) {
+                    using trait_ = fmha_fwd_traits_<128, FmhaFwdFp16, true, 64, 64, 32, 128, 32, 128, true, ck_tile::BlockFmhaPipelineEnum::QRKSVS_HPAD, false, ck_tile::SimplifiedGenericAttentionMask<false>, ck_tile::BlockAttentionBiasEnum::NO_BIAS, true, false, ck_tile::BlockAttentionQuantScaleEnum::NO_SCALE, true, true, true, true, false, false, false>;
+                    return fmha_fwd_<trait_, ck_tile::gfx12_t>(s, a);
+                }
+                else if((t.is_group_mode == true) && (t.is_v_rowmajor == true) && (t.has_logits_soft_cap == false) && (t.mask_type == mask_enum::no_mask) && (t.bias_type == bias_enum::alibi) && (t.has_lse == true)  && (t.has_dropout == false) && (t.qscale_type == quant_scale_enum::no_scale) && (t.skip_min_seqlen_q == false) &&(t.has_sink == false) &&
+                        (true/*group mode spad always true*/) && (true/*fall back to largest tile*/) && (true/*group mode skpad always true*/) && (a.hdim_q % 128 == 0) && (a.hdim_v % 128 == 0) && ((a.max_seqlen_q <= 4096) && (true))) {
+                    using trait_ = fmha_fwd_traits_<128, FmhaFwdFp16, true, 64, 64, 32, 128, 32, 128, true, ck_tile::BlockFmhaPipelineEnum::QRKSVS, false, ck_tile::SimplifiedGenericAttentionMask<false>, ck_tile::BlockAttentionBiasEnum::ALIBI, true, false, ck_tile::BlockAttentionQuantScaleEnum::NO_SCALE, true, true, false, false, false, false, false>;
+                    return fmha_fwd_<trait_, ck_tile::gfx12_t>(s, a);
+                }
+                else if((t.is_group_mode == true) && (t.is_v_rowmajor == true) && (t.has_logits_soft_cap == false) && (t.mask_type == mask_enum::no_mask) && (t.bias_type == bias_enum::alibi) && (t.has_lse == true)  && (t.has_dropout == false) && (t.qscale_type == quant_scale_enum::no_scale) && (t.skip_min_seqlen_q == false) &&(t.has_sink == false) &&
+                        (true/*group mode spad always true*/) && (true/*fall back to largest tile*/) && (true/*group mode skpad always true*/) && (a.hdim_q % 8 == 0) && (a.hdim_v % 8 == 0) && ((a.max_seqlen_q <= 4096) && (true))) {
+                    using trait_ = fmha_fwd_traits_<128, FmhaFwdFp16, true, 64, 64, 32, 128, 32, 128, true, ck_tile::BlockFmhaPipelineEnum::QRKSVS_HPAD, false, ck_tile::SimplifiedGenericAttentionMask<false>, ck_tile::BlockAttentionBiasEnum::ALIBI, true, false, ck_tile::BlockAttentionQuantScaleEnum::NO_SCALE, true, true, true, true, false, false, false>;
+                    return fmha_fwd_<trait_, ck_tile::gfx12_t>(s, a);
+                }
+                else if((t.is_group_mode == true) && (t.is_v_rowmajor == true) && (t.has_logits_soft_cap == false) && (t.mask_type != mask_enum::no_mask) && (t.bias_type == bias_enum::no_bias) && (t.has_lse == true)  && (t.has_dropout == false) && (t.qscale_type == quant_scale_enum::no_scale) && (t.skip_min_seqlen_q == false) &&(t.has_sink == false) &&
+                        (true/*group mode spad always true*/) && (true/*fall back to largest tile*/) && (true/*group mode skpad always true*/) && (a.hdim_q % 128 == 0) && (a.hdim_v % 128 == 0) && ((a.max_seqlen_q <= 4096) && (true))) {
+                    using trait_ = fmha_fwd_traits_<128, FmhaFwdFp16, true, 64, 64, 32, 128, 32, 128, true, ck_tile::BlockFmhaPipelineEnum::QRKSVS, false, ck_tile::SimplifiedGenericAttentionMask<true>, ck_tile::BlockAttentionBiasEnum::NO_BIAS, true, false, ck_tile::BlockAttentionQuantScaleEnum::NO_SCALE, true, true, false, false, false, false, false>;
+                    return fmha_fwd_<trait_, ck_tile::gfx12_t>(s, a);
+                }
+                else if((t.is_group_mode == true) && (t.is_v_rowmajor == true) && (t.has_logits_soft_cap == false) && (t.mask_type != mask_enum::no_mask) && (t.bias_type == bias_enum::no_bias) && (t.has_lse == true)  && (t.has_dropout == false) && (t.qscale_type == quant_scale_enum::no_scale) && (t.skip_min_seqlen_q == false) &&(t.has_sink == false) &&
+                        (true/*group mode spad always true*/) && (true/*fall back to largest tile*/) && (true/*group mode skpad always true*/) && (a.hdim_q % 8 == 0) && (a.hdim_v % 8 == 0) && ((a.max_seqlen_q <= 4096) && (true))) {
+                    using trait_ = fmha_fwd_traits_<128, FmhaFwdFp16, true, 64, 64, 32, 128, 32, 128, true, ck_tile::BlockFmhaPipelineEnum::QRKSVS_HPAD, false, ck_tile::SimplifiedGenericAttentionMask<true>, ck_tile::BlockAttentionBiasEnum::NO_BIAS, true, false, ck_tile::BlockAttentionQuantScaleEnum::NO_SCALE, true, true, true, true, false, false, false>;
+                    return fmha_fwd_<trait_, ck_tile::gfx12_t>(s, a);
+                }
+                else if((t.is_group_mode == true) && (t.is_v_rowmajor == true) && (t.has_logits_soft_cap == false) && (t.mask_type != mask_enum::no_mask) && (t.bias_type == bias_enum::alibi) && (t.has_lse == true)  && (t.has_dropout == false) && (t.qscale_type == quant_scale_enum::no_scale) && (t.skip_min_seqlen_q == false) &&(t.has_sink == false) &&
+                        (true/*group mode spad always true*/) && (true/*fall back to largest tile*/) && (true/*group mode skpad always true*/) && (a.hdim_q % 128 == 0) && (a.hdim_v % 128 == 0) && ((a.max_seqlen_q <= 4096) && (true))) {
+                    using trait_ = fmha_fwd_traits_<128, FmhaFwdFp16, true, 64, 64, 32, 128, 32, 128, true, ck_tile::BlockFmhaPipelineEnum::QRKSVS, false, ck_tile::SimplifiedGenericAttentionMask<true>, ck_tile::BlockAttentionBiasEnum::ALIBI, true, false, ck_tile::BlockAttentionQuantScaleEnum::NO_SCALE, true, true, false, false, false, false, false>;
+                    return fmha_fwd_<trait_, ck_tile::gfx12_t>(s, a);
+                }
+                else if((t.is_group_mode == true) && (t.is_v_rowmajor == true) && (t.has_logits_soft_cap == false) && (t.mask_type != mask_enum::no_mask) && (t.bias_type == bias_enum::alibi) && (t.has_lse == true)  && (t.has_dropout == false) && (t.qscale_type == quant_scale_enum::no_scale) && (t.skip_min_seqlen_q == false) &&(t.has_sink == false) &&
+                        (true/*group mode spad always true*/) && (true/*fall back to largest tile*/) && (true/*group mode skpad always true*/) && (a.hdim_q % 8 == 0) && (a.hdim_v % 8 == 0) && ((a.max_seqlen_q <= 4096) && (true))) {
+                    using trait_ = fmha_fwd_traits_<128, FmhaFwdFp16, true, 64, 64, 32, 128, 32, 128, true, ck_tile::BlockFmhaPipelineEnum::QRKSVS_HPAD, false, ck_tile::SimplifiedGenericAttentionMask<true>, ck_tile::BlockAttentionBiasEnum::ALIBI, true, false, ck_tile::BlockAttentionQuantScaleEnum::NO_SCALE, true, true, true, true, false, false, false>;
+                    return fmha_fwd_<trait_, ck_tile::gfx12_t>(s, a);
+                }
+                else if((t.is_group_mode == true) && (t.is_v_rowmajor == true) && (t.has_logits_soft_cap == false) && (t.mask_type == mask_enum::no_mask) && (t.bias_type == bias_enum::no_bias) && (t.has_lse == true)  && (t.has_dropout == false) && (t.qscale_type == quant_scale_enum::no_scale) && (t.skip_min_seqlen_q == false) &&(t.has_sink == false) &&
+                        (true/*group mode spad always true*/) && (true/*fall back to largest tile*/) && (true/*group mode skpad always true*/) && (a.hdim_q % 128 == 0) && (a.hdim_v % 128 == 0) && ((true) && (true))) {
+                    using trait_ = fmha_fwd_traits_<128, FmhaFwdFp16, true, 128, 64, 32, 128, 32, 128, true, ck_tile::BlockFmhaPipelineEnum::QRKSVS, false, ck_tile::SimplifiedGenericAttentionMask<false>, ck_tile::BlockAttentionBiasEnum::NO_BIAS, true, false, ck_tile::BlockAttentionQuantScaleEnum::NO_SCALE, true, true, false, false, false, false, false>;
+                    return fmha_fwd_<trait_, ck_tile::gfx12_t>(s, a);
+                }
+                else if((t.is_group_mode == true) && (t.is_v_rowmajor == true) && (t.has_logits_soft_cap == false) && (t.mask_type == mask_enum::no_mask) && (t.bias_type == bias_enum::no_bias) && (t.has_lse == true)  && (t.has_dropout == false) && (t.qscale_type == quant_scale_enum::no_scale) && (t.skip_min_seqlen_q == false) &&(t.has_sink == false) &&
+                        (true/*group mode spad always true*/) && (true/*fall back to largest tile*/) && (true/*group mode skpad always true*/) && (a.hdim_q % 8 == 0) && (a.hdim_v % 8 == 0) && ((true) && (true))) {
+                    using trait_ = fmha_fwd_traits_<128, FmhaFwdFp16, true, 128, 64, 32, 128, 32, 128, true, ck_tile::BlockFmhaPipelineEnum::QRKSVS_HPAD, false, ck_tile::SimplifiedGenericAttentionMask<false>, ck_tile::BlockAttentionBiasEnum::NO_BIAS, true, false, ck_tile::BlockAttentionQuantScaleEnum::NO_SCALE, true, true, true, true, false, false, false>;
+                    return fmha_fwd_<trait_, ck_tile::gfx12_t>(s, a);
+                }
+                else if((t.is_group_mode == true) && (t.is_v_rowmajor == true) && (t.has_logits_soft_cap == false) && (t.mask_type == mask_enum::no_mask) && (t.bias_type == bias_enum::alibi) && (t.has_lse == true)  && (t.has_dropout == false) && (t.qscale_type == quant_scale_enum::no_scale) && (t.skip_min_seqlen_q == false) &&(t.has_sink == false) &&
+                        (true/*group mode spad always true*/) && (true/*fall back to largest tile*/) && (true/*group mode skpad always true*/) && (a.hdim_q % 128 == 0) && (a.hdim_v % 128 == 0) && ((true) && (true))) {
+                    using trait_ = fmha_fwd_traits_<128, FmhaFwdFp16, true, 128, 64, 32, 128, 32, 128, true, ck_tile::BlockFmhaPipelineEnum::QRKSVS, false, ck_tile::SimplifiedGenericAttentionMask<false>, ck_tile::BlockAttentionBiasEnum::ALIBI, true, false, ck_tile::BlockAttentionQuantScaleEnum::NO_SCALE, true, true, false, false, false, false, false>;
+                    return fmha_fwd_<trait_, ck_tile::gfx12_t>(s, a);
+                }
+                else if((t.is_group_mode == true) && (t.is_v_rowmajor == true) && (t.has_logits_soft_cap == false) && (t.mask_type == mask_enum::no_mask) && (t.bias_type == bias_enum::alibi) && (t.has_lse == true)  && (t.has_dropout == false) && (t.qscale_type == quant_scale_enum::no_scale) && (t.skip_min_seqlen_q == false) &&(t.has_sink == false) &&
+                        (true/*group mode spad always true*/) && (true/*fall back to largest tile*/) && (true/*group mode skpad always true*/) && (a.hdim_q % 8 == 0) && (a.hdim_v % 8 == 0) && ((true) && (true))) {
+                    using trait_ = fmha_fwd_traits_<128, FmhaFwdFp16, true, 128, 64, 32, 128, 32, 128, true, ck_tile::BlockFmhaPipelineEnum::QRKSVS_HPAD, false, ck_tile::SimplifiedGenericAttentionMask<false>, ck_tile::BlockAttentionBiasEnum::ALIBI, true, false, ck_tile::BlockAttentionQuantScaleEnum::NO_SCALE, true, true, true, true, false, false, false>;
+                    return fmha_fwd_<trait_, ck_tile::gfx12_t>(s, a);
+                }
+                else if((t.is_group_mode == true) && (t.is_v_rowmajor == true) && (t.has_logits_soft_cap == false) && (t.mask_type != mask_enum::no_mask) && (t.bias_type == bias_enum::no_bias) && (t.has_lse == true)  && (t.has_dropout == false) && (t.qscale_type == quant_scale_enum::no_scale) && (t.skip_min_seqlen_q == false) &&(t.has_sink == false) &&
+                        (true/*group mode spad always true*/) && (true/*fall back to largest tile*/) && (true/*group mode skpad always true*/) && (a.hdim_q % 128 == 0) && (a.hdim_v % 128 == 0) && ((true) && (true))) {
+                    using trait_ = fmha_fwd_traits_<128, FmhaFwdFp16, true, 128, 64, 32, 128, 32, 128, true, ck_tile::BlockFmhaPipelineEnum::QRKSVS, false, ck_tile::SimplifiedGenericAttentionMask<true>, ck_tile::BlockAttentionBiasEnum::NO_BIAS, true, false, ck_tile::BlockAttentionQuantScaleEnum::NO_SCALE, true, true, false, false, false, false, false>;
+                    return fmha_fwd_<trait_, ck_tile::gfx12_t>(s, a);
+                }
+                else if((t.is_group_mode == true) && (t.is_v_rowmajor == true) && (t.has_logits_soft_cap == false) && (t.mask_type != mask_enum::no_mask) && (t.bias_type == bias_enum::no_bias) && (t.has_lse == true)  && (t.has_dropout == false) && (t.qscale_type == quant_scale_enum::no_scale) && (t.skip_min_seqlen_q == false) &&(t.has_sink == false) &&
+                        (true/*group mode spad always true*/) && (true/*fall back to largest tile*/) && (true/*group mode skpad always true*/) && (a.hdim_q % 8 == 0) && (a.hdim_v % 8 == 0) && ((true) && (true))) {
+                    using trait_ = fmha_fwd_traits_<128, FmhaFwdFp16, true, 128, 64, 32, 128, 32, 128, true, ck_tile::BlockFmhaPipelineEnum::QRKSVS_HPAD, false, ck_tile::SimplifiedGenericAttentionMask<true>, ck_tile::BlockAttentionBiasEnum::NO_BIAS, true, false, ck_tile::BlockAttentionQuantScaleEnum::NO_SCALE, true, true, true, true, false, false, false>;
+                    return fmha_fwd_<trait_, ck_tile::gfx12_t>(s, a);
+                }
+                else if((t.is_group_mode == true) && (t.is_v_rowmajor == true) && (t.has_logits_soft_cap == false) && (t.mask_type != mask_enum::no_mask) && (t.bias_type == bias_enum::alibi) && (t.has_lse == true)  && (t.has_dropout == false) && (t.qscale_type == quant_scale_enum::no_scale) && (t.skip_min_seqlen_q == false) &&(t.has_sink == false) &&
+                        (true/*group mode spad always true*/) && (true/*fall back to largest tile*/) && (true/*group mode skpad always true*/) && (a.hdim_q % 128 == 0) && (a.hdim_v % 128 == 0) && ((true) && (true))) {
+                    using trait_ = fmha_fwd_traits_<128, FmhaFwdFp16, true, 128, 64, 32, 128, 32, 128, true, ck_tile::BlockFmhaPipelineEnum::QRKSVS, false, ck_tile::SimplifiedGenericAttentionMask<true>, ck_tile::BlockAttentionBiasEnum::ALIBI, true, false, ck_tile::BlockAttentionQuantScaleEnum::NO_SCALE, true, true, false, false, false, false, false>;
+                    return fmha_fwd_<trait_, ck_tile::gfx12_t>(s, a);
+                }
+                else if((t.is_group_mode == true) && (t.is_v_rowmajor == true) && (t.has_logits_soft_cap == false) && (t.mask_type != mask_enum::no_mask) && (t.bias_type == bias_enum::alibi) && (t.has_lse == true)  && (t.has_dropout == false) && (t.qscale_type == quant_scale_enum::no_scale) && (t.skip_min_seqlen_q == false) &&(t.has_sink == false) &&
+                        (true/*group mode spad always true*/) && (true/*fall back to largest tile*/) && (true/*group mode skpad always true*/) && (a.hdim_q % 8 == 0) && (a.hdim_v % 8 == 0) && ((true) && (true))) {
+                    using trait_ = fmha_fwd_traits_<128, FmhaFwdFp16, true, 128, 64, 32, 128, 32, 128, true, ck_tile::BlockFmhaPipelineEnum::QRKSVS_HPAD, false, ck_tile::SimplifiedGenericAttentionMask<true>, ck_tile::BlockAttentionBiasEnum::ALIBI, true, false, ck_tile::BlockAttentionQuantScaleEnum::NO_SCALE, true, true, true, true, false, false, false>;
+                    return fmha_fwd_<trait_, ck_tile::gfx12_t>(s, a);
+                }
+
+            }
+
+        }
+        else if(t.data_type.compare("bf16") == 0) {
+            if(t.hdim_q <= 128 && t.hdim_v <= 128) {
+                if((t.is_group_mode == false) && (t.is_v_rowmajor == true) && (t.has_logits_soft_cap == false) && (t.mask_type == mask_enum::no_mask) && (t.bias_type == bias_enum::no_bias) && (t.has_lse == true)  && (t.has_dropout == false) && (t.qscale_type == quant_scale_enum::no_scale) && (t.skip_min_seqlen_q == false) &&(t.has_sink == false) &&
+                        (true /*a.seqlen_q % 64 != 0*/) && (true/*fall back to largest tile*/) && (true /*a.seqlen_k % 64 != 0*/) && (a.hdim_q % 128 == 0) && (a.hdim_v % 128 == 0) && ((a.max_seqlen_q <= 4096) && (true))) {
+                    using trait_ = fmha_fwd_traits_<128, FmhaFwdBf16, false, 64, 64, 32, 128, 32, 128, true, ck_tile::BlockFmhaPipelineEnum::QRKSVS, false, ck_tile::SimplifiedGenericAttentionMask<false>, ck_tile::BlockAttentionBiasEnum::NO_BIAS, true, false, ck_tile::BlockAttentionQuantScaleEnum::NO_SCALE, true, true, false, false, false, false, false>;
+                    return fmha_fwd_<trait_, ck_tile::gfx12_t>(s, a);
+                }
+                else if((t.is_group_mode == false) && (t.is_v_rowmajor == true) && (t.has_logits_soft_cap == false) && (t.mask_type == mask_enum::no_mask) && (t.bias_type == bias_enum::no_bias) && (t.has_lse == true)  && (t.has_dropout == false) && (t.qscale_type == quant_scale_enum::no_scale) && (t.skip_min_seqlen_q == false) &&(t.has_sink == false) &&
+                        (true /*a.seqlen_q % 64 != 0*/) && (true/*fall back to largest tile*/) && (true /*a.seqlen_k % 64 != 0*/) && (a.hdim_q % 8 == 0) && (a.hdim_v % 8 == 0) && ((a.max_seqlen_q <= 4096) && (true))) {
+                    using trait_ = fmha_fwd_traits_<128, FmhaFwdBf16, false, 64, 64, 32, 128, 32, 128, true, ck_tile::BlockFmhaPipelineEnum::QRKSVS_HPAD, false, ck_tile::SimplifiedGenericAttentionMask<false>, ck_tile::BlockAttentionBiasEnum::NO_BIAS, true, false, ck_tile::BlockAttentionQuantScaleEnum::NO_SCALE, true, true, true, true, false, false, false>;
+                    return fmha_fwd_<trait_, ck_tile::gfx12_t>(s, a);
+                }
+                else if((t.is_group_mode == false) && (t.is_v_rowmajor == true) && (t.has_logits_soft_cap == false) && (t.mask_type == mask_enum::no_mask) && (t.bias_type == bias_enum::alibi) && (t.has_lse == true)  && (t.has_dropout == false) && (t.qscale_type == quant_scale_enum::no_scale) && (t.skip_min_seqlen_q == false) &&(t.has_sink == false) &&
+                        (true /*a.seqlen_q % 64 != 0*/) && (true/*fall back to largest tile*/) && (true /*a.seqlen_k % 64 != 0*/) && (a.hdim_q % 128 == 0) && (a.hdim_v % 128 == 0) && ((a.max_seqlen_q <= 4096) && (true))) {
+                    using trait_ = fmha_fwd_traits_<128, FmhaFwdBf16, false, 64, 64, 32, 128, 32, 128, true, ck_tile::BlockFmhaPipelineEnum::QRKSVS, false, ck_tile::SimplifiedGenericAttentionMask<false>, ck_tile::BlockAttentionBiasEnum::ALIBI, true, false, ck_tile::BlockAttentionQuantScaleEnum::NO_SCALE, true, true, false, false, false, false, false>;
+                    return fmha_fwd_<trait_, ck_tile::gfx12_t>(s, a);
+                }
+                else if((t.is_group_mode == false) && (t.is_v_rowmajor == true) && (t.has_logits_soft_cap == false) && (t.mask_type == mask_enum::no_mask) && (t.bias_type == bias_enum::alibi) && (t.has_lse == true)  && (t.has_dropout == false) && (t.qscale_type == quant_scale_enum::no_scale) && (t.skip_min_seqlen_q == false) &&(t.has_sink == false) &&
+                        (true /*a.seqlen_q % 64 != 0*/) && (true/*fall back to largest tile*/) && (true /*a.seqlen_k % 64 != 0*/) && (a.hdim_q % 8 == 0) && (a.hdim_v % 8 == 0) && ((a.max_seqlen_q <= 4096) && (true))) {
+                    using trait_ = fmha_fwd_traits_<128, FmhaFwdBf16, false, 64, 64, 32, 128, 32, 128, true, ck_tile::BlockFmhaPipelineEnum::QRKSVS_HPAD, false, ck_tile::SimplifiedGenericAttentionMask<false>, ck_tile::BlockAttentionBiasEnum::ALIBI, true, false, ck_tile::BlockAttentionQuantScaleEnum::NO_SCALE, true, true, true, true, false, false, false>;
+                    return fmha_fwd_<trait_, ck_tile::gfx12_t>(s, a);
+                }
+                else if((t.is_group_mode == false) && (t.is_v_rowmajor == true) && (t.has_logits_soft_cap == false) && (t.mask_type != mask_enum::no_mask) && (t.bias_type == bias_enum::no_bias) && (t.has_lse == true)  && (t.has_dropout == false) && (t.qscale_type == quant_scale_enum::no_scale) && (t.skip_min_seqlen_q == false) &&(t.has_sink == false) &&
+                        (true /*a.seqlen_q % 64 != 0*/) && (true/*fall back to largest tile*/) && (true /*a.seqlen_k % 64 != 0*/) && (a.hdim_q % 128 == 0) && (a.hdim_v % 128 == 0) && ((a.max_seqlen_q <= 4096) && (true))) {
+                    using trait_ = fmha_fwd_traits_<128, FmhaFwdBf16, false, 64, 64, 32, 128, 32, 128, true, ck_tile::BlockFmhaPipelineEnum::QRKSVS, false, ck_tile::SimplifiedGenericAttentionMask<true>, ck_tile::BlockAttentionBiasEnum::NO_BIAS, true, false, ck_tile::BlockAttentionQuantScaleEnum::NO_SCALE, true, true, false, false, false, false, false>;
+                    return fmha_fwd_<trait_, ck_tile::gfx12_t>(s, a);
+                }
+                else if((t.is_group_mode == false) && (t.is_v_rowmajor == true) && (t.has_logits_soft_cap == false) && (t.mask_type != mask_enum::no_mask) && (t.bias_type == bias_enum::no_bias) && (t.has_lse == true)  && (t.has_dropout == false) && (t.qscale_type == quant_scale_enum::no_scale) && (t.skip_min_seqlen_q == false) &&(t.has_sink == false) &&
+                        (true /*a.seqlen_q % 64 != 0*/) && (true/*fall back to largest tile*/) && (true /*a.seqlen_k % 64 != 0*/) && (a.hdim_q % 8 == 0) && (a.hdim_v % 8 == 0) && ((a.max_seqlen_q <= 4096) && (true))) {
+                    using trait_ = fmha_fwd_traits_<128, FmhaFwdBf16, false, 64, 64, 32, 128, 32, 128, true, ck_tile::BlockFmhaPipelineEnum::QRKSVS_HPAD, false, ck_tile::SimplifiedGenericAttentionMask<true>, ck_tile::BlockAttentionBiasEnum::NO_BIAS, true, false, ck_tile::BlockAttentionQuantScaleEnum::NO_SCALE, true, true, true, true, false, false, false>;
+                    return fmha_fwd_<trait_, ck_tile::gfx12_t>(s, a);
+                }
+                else if((t.is_group_mode == false) && (t.is_v_rowmajor == true) && (t.has_logits_soft_cap == false) && (t.mask_type != mask_enum::no_mask) && (t.bias_type == bias_enum::alibi) && (t.has_lse == true)  && (t.has_dropout == false) && (t.qscale_type == quant_scale_enum::no_scale) && (t.skip_min_seqlen_q == false) &&(t.has_sink == false) &&
+                        (true /*a.seqlen_q % 64 != 0*/) && (true/*fall back to largest tile*/) && (true /*a.seqlen_k % 64 != 0*/) && (a.hdim_q % 128 == 0) && (a.hdim_v % 128 == 0) && ((a.max_seqlen_q <= 4096) && (true))) {
+                    using trait_ = fmha_fwd_traits_<128, FmhaFwdBf16, false, 64, 64, 32, 128, 32, 128, true, ck_tile::BlockFmhaPipelineEnum::QRKSVS, false, ck_tile::SimplifiedGenericAttentionMask<true>, ck_tile::BlockAttentionBiasEnum::ALIBI, true, false, ck_tile::BlockAttentionQuantScaleEnum::NO_SCALE, true, true, false, false, false, false, false>;
+                    return fmha_fwd_<trait_, ck_tile::gfx12_t>(s, a);
+                }
+                else if((t.is_group_mode == false) && (t.is_v_rowmajor == true) && (t.has_logits_soft_cap == false) && (t.mask_type != mask_enum::no_mask) && (t.bias_type == bias_enum::alibi) && (t.has_lse == true)  && (t.has_dropout == false) && (t.qscale_type == quant_scale_enum::no_scale) && (t.skip_min_seqlen_q == false) &&(t.has_sink == false) &&
+                        (true /*a.seqlen_q % 64 != 0*/) && (true/*fall back to largest tile*/) && (true /*a.seqlen_k % 64 != 0*/) && (a.hdim_q % 8 == 0) && (a.hdim_v % 8 == 0) && ((a.max_seqlen_q <= 4096) && (true))) {
+                    using trait_ = fmha_fwd_traits_<128, FmhaFwdBf16, false, 64, 64, 32, 128, 32, 128, true, ck_tile::BlockFmhaPipelineEnum::QRKSVS_HPAD, false, ck_tile::SimplifiedGenericAttentionMask<true>, ck_tile::BlockAttentionBiasEnum::ALIBI, true, false, ck_tile::BlockAttentionQuantScaleEnum::NO_SCALE, true, true, true, true, false, false, false>;
+                    return fmha_fwd_<trait_, ck_tile::gfx12_t>(s, a);
+                }
+                else if((t.is_group_mode == false) && (t.is_v_rowmajor == true) && (t.has_logits_soft_cap == false) && (t.mask_type == mask_enum::no_mask) && (t.bias_type == bias_enum::no_bias) && (t.has_lse == true)  && (t.has_dropout == false) && (t.qscale_type == quant_scale_enum::no_scale) && (t.skip_min_seqlen_q == false) &&(t.has_sink == false) &&
+                        (true /*a.seqlen_q % 128 != 0*/) && (true/*fall back to largest tile*/) && (true /*a.seqlen_k % 64 != 0*/) && (a.hdim_q % 128 == 0) && (a.hdim_v % 128 == 0) && ((true) && (true))) {
+                    using trait_ = fmha_fwd_traits_<128, FmhaFwdBf16, false, 128, 64, 32, 128, 32, 128, true, ck_tile::BlockFmhaPipelineEnum::QRKSVS, false, ck_tile::SimplifiedGenericAttentionMask<false>, ck_tile::BlockAttentionBiasEnum::NO_BIAS, true, false, ck_tile::BlockAttentionQuantScaleEnum::NO_SCALE, true, true, false, false, false, false, false>;
+                    return fmha_fwd_<trait_, ck_tile::gfx12_t>(s, a);
+                }
+                else if((t.is_group_mode == false) && (t.is_v_rowmajor == true) && (t.has_logits_soft_cap == false) && (t.mask_type == mask_enum::no_mask) && (t.bias_type == bias_enum::no_bias) && (t.has_lse == true)  && (t.has_dropout == false) && (t.qscale_type == quant_scale_enum::no_scale) && (t.skip_min_seqlen_q == false) &&(t.has_sink == false) &&
+                        (true /*a.seqlen_q % 128 != 0*/) && (true/*fall back to largest tile*/) && (true /*a.seqlen_k % 64 != 0*/) && (a.hdim_q % 8 == 0) && (a.hdim_v % 8 == 0) && ((true) && (true))) {
+                    using trait_ = fmha_fwd_traits_<128, FmhaFwdBf16, false, 128, 64, 32, 128, 32, 128, true, ck_tile::BlockFmhaPipelineEnum::QRKSVS_HPAD, false, ck_tile::SimplifiedGenericAttentionMask<false>, ck_tile::BlockAttentionBiasEnum::NO_BIAS, true, false, ck_tile::BlockAttentionQuantScaleEnum::NO_SCALE, true, true, true, true, false, false, false>;
+                    return fmha_fwd_<trait_, ck_tile::gfx12_t>(s, a);
+                }
+                else if((t.is_group_mode == false) && (t.is_v_rowmajor == true) && (t.has_logits_soft_cap == false) && (t.mask_type == mask_enum::no_mask) && (t.bias_type == bias_enum::alibi) && (t.has_lse == true)  && (t.has_dropout == false) && (t.qscale_type == quant_scale_enum::no_scale) && (t.skip_min_seqlen_q == false) &&(t.has_sink == false) &&
+                        (true /*a.seqlen_q % 128 != 0*/) && (true/*fall back to largest tile*/) && (true /*a.seqlen_k % 64 != 0*/) && (a.hdim_q % 128 == 0) && (a.hdim_v % 128 == 0) && ((true) && (true))) {
+                    using trait_ = fmha_fwd_traits_<128, FmhaFwdBf16, false, 128, 64, 32, 128, 32, 128, true, ck_tile::BlockFmhaPipelineEnum::QRKSVS, false, ck_tile::SimplifiedGenericAttentionMask<false>, ck_tile::BlockAttentionBiasEnum::ALIBI, true, false, ck_tile::BlockAttentionQuantScaleEnum::NO_SCALE, true, true, false, false, false, false, false>;
+                    return fmha_fwd_<trait_, ck_tile::gfx12_t>(s, a);
+                }
+                else if((t.is_group_mode == false) && (t.is_v_rowmajor == true) && (t.has_logits_soft_cap == false) && (t.mask_type == mask_enum::no_mask) && (t.bias_type == bias_enum::alibi) && (t.has_lse == true)  && (t.has_dropout == false) && (t.qscale_type == quant_scale_enum::no_scale) && (t.skip_min_seqlen_q == false) &&(t.has_sink == false) &&
+                        (true /*a.seqlen_q % 128 != 0*/) && (true/*fall back to largest tile*/) && (true /*a.seqlen_k % 64 != 0*/) && (a.hdim_q % 8 == 0) && (a.hdim_v % 8 == 0) && ((true) && (true))) {
+                    using trait_ = fmha_fwd_traits_<128, FmhaFwdBf16, false, 128, 64, 32, 128, 32, 128, true, ck_tile::BlockFmhaPipelineEnum::QRKSVS_HPAD, false, ck_tile::SimplifiedGenericAttentionMask<false>, ck_tile::BlockAttentionBiasEnum::ALIBI, true, false, ck_tile::BlockAttentionQuantScaleEnum::NO_SCALE, true, true, true, true, false, false, false>;
+                    return fmha_fwd_<trait_, ck_tile::gfx12_t>(s, a);
+                }
+                else if((t.is_group_mode == false) && (t.is_v_rowmajor == true) && (t.has_logits_soft_cap == false) && (t.mask_type != mask_enum::no_mask) && (t.bias_type == bias_enum::no_bias) && (t.has_lse == true)  && (t.has_dropout == false) && (t.qscale_type == quant_scale_enum::no_scale) && (t.skip_min_seqlen_q == false) &&(t.has_sink == false) &&
+                        (true /*a.seqlen_q % 128 != 0*/) && (true/*fall back to largest tile*/) && (true /*a.seqlen_k % 64 != 0*/) && (a.hdim_q % 128 == 0) && (a.hdim_v % 128 == 0) && ((true) && (true))) {
+                    using trait_ = fmha_fwd_traits_<128, FmhaFwdBf16, false, 128, 64, 32, 128, 32, 128, true, ck_tile::BlockFmhaPipelineEnum::QRKSVS, false, ck_tile::SimplifiedGenericAttentionMask<true>, ck_tile::BlockAttentionBiasEnum::NO_BIAS, true, false, ck_tile::BlockAttentionQuantScaleEnum::NO_SCALE, true, true, false, false, false, false, false>;
+                    return fmha_fwd_<trait_, ck_tile::gfx12_t>(s, a);
+                }
+                else if((t.is_group_mode == false) && (t.is_v_rowmajor == true) && (t.has_logits_soft_cap == false) && (t.mask_type != mask_enum::no_mask) && (t.bias_type == bias_enum::no_bias) && (t.has_lse == true)  && (t.has_dropout == false) && (t.qscale_type == quant_scale_enum::no_scale) && (t.skip_min_seqlen_q == false) &&(t.has_sink == false) &&
+                        (true /*a.seqlen_q % 128 != 0*/) && (true/*fall back to largest tile*/) && (true /*a.seqlen_k % 64 != 0*/) && (a.hdim_q % 8 == 0) && (a.hdim_v % 8 == 0) && ((true) && (true))) {
+                    using trait_ = fmha_fwd_traits_<128, FmhaFwdBf16, false, 128, 64, 32, 128, 32, 128, true, ck_tile::BlockFmhaPipelineEnum::QRKSVS_HPAD, false, ck_tile::SimplifiedGenericAttentionMask<true>, ck_tile::BlockAttentionBiasEnum::NO_BIAS, true, false, ck_tile::BlockAttentionQuantScaleEnum::NO_SCALE, true, true, true, true, false, false, false>;
+                    return fmha_fwd_<trait_, ck_tile::gfx12_t>(s, a);
+                }
+                else if((t.is_group_mode == false) && (t.is_v_rowmajor == true) && (t.has_logits_soft_cap == false) && (t.mask_type != mask_enum::no_mask) && (t.bias_type == bias_enum::alibi) && (t.has_lse == true)  && (t.has_dropout == false) && (t.qscale_type == quant_scale_enum::no_scale) && (t.skip_min_seqlen_q == false) &&(t.has_sink == false) &&
+                        (true /*a.seqlen_q % 128 != 0*/) && (true/*fall back to largest tile*/) && (true /*a.seqlen_k % 64 != 0*/) && (a.hdim_q % 128 == 0) && (a.hdim_v % 128 == 0) && ((true) && (true))) {
+                    using trait_ = fmha_fwd_traits_<128, FmhaFwdBf16, false, 128, 64, 32, 128, 32, 128, true, ck_tile::BlockFmhaPipelineEnum::QRKSVS, false, ck_tile::SimplifiedGenericAttentionMask<true>, ck_tile::BlockAttentionBiasEnum::ALIBI, true, false, ck_tile::BlockAttentionQuantScaleEnum::NO_SCALE, true, true, false, false, false, false, false>;
+                    return fmha_fwd_<trait_, ck_tile::gfx12_t>(s, a);
+                }
+                else if((t.is_group_mode == false) && (t.is_v_rowmajor == true) && (t.has_logits_soft_cap == false) && (t.mask_type != mask_enum::no_mask) && (t.bias_type == bias_enum::alibi) && (t.has_lse == true)  && (t.has_dropout == false) && (t.qscale_type == quant_scale_enum::no_scale) && (t.skip_min_seqlen_q == false) &&(t.has_sink == false) &&
+                        (true /*a.seqlen_q % 128 != 0*/) && (true/*fall back to largest tile*/) && (true /*a.seqlen_k % 64 != 0*/) && (a.hdim_q % 8 == 0) && (a.hdim_v % 8 == 0) && ((true) && (true))) {
+                    using trait_ = fmha_fwd_traits_<128, FmhaFwdBf16, false, 128, 64, 32, 128, 32, 128, true, ck_tile::BlockFmhaPipelineEnum::QRKSVS_HPAD, false, ck_tile::SimplifiedGenericAttentionMask<true>, ck_tile::BlockAttentionBiasEnum::ALIBI, true, false, ck_tile::BlockAttentionQuantScaleEnum::NO_SCALE, true, true, true, true, false, false, false>;
+                    return fmha_fwd_<trait_, ck_tile::gfx12_t>(s, a);
+                }
+                else if((t.is_group_mode == true) && (t.is_v_rowmajor == true) && (t.has_logits_soft_cap == false) && (t.mask_type == mask_enum::no_mask) && (t.bias_type == bias_enum::no_bias) && (t.has_lse == true)  && (t.has_dropout == false) && (t.qscale_type == quant_scale_enum::no_scale) && (t.skip_min_seqlen_q == false) &&(t.has_sink == false) &&
+                        (true/*group mode spad always true*/) && (true/*fall back to largest tile*/) && (true/*group mode skpad always true*/) && (a.hdim_q % 128 == 0) && (a.hdim_v % 128 == 0) && ((a.max_seqlen_q <= 4096) && (true))) {
+                    using trait_ = fmha_fwd_traits_<128, FmhaFwdBf16, true, 64, 64, 32, 128, 32, 128, true, ck_tile::BlockFmhaPipelineEnum::QRKSVS, false, ck_tile::SimplifiedGenericAttentionMask<false>, ck_tile::BlockAttentionBiasEnum::NO_BIAS, true, false, ck_tile::BlockAttentionQuantScaleEnum::NO_SCALE, true, true, false, false, false, false, false>;
+                    return fmha_fwd_<trait_, ck_tile::gfx12_t>(s, a);
+                }
+                else if((t.is_group_mode == true) && (t.is_v_rowmajor == true) && (t.has_logits_soft_cap == false) && (t.mask_type == mask_enum::no_mask) && (t.bias_type == bias_enum::no_bias) && (t.has_lse == true)  && (t.has_dropout == false) && (t.qscale_type == quant_scale_enum::no_scale) && (t.skip_min_seqlen_q == false) &&(t.has_sink == false) &&
+                        (true/*group mode spad always true*/) && (true/*fall back to largest tile*/) && (true/*group mode skpad always true*/) && (a.hdim_q % 8 == 0) && (a.hdim_v % 8 == 0) && ((a.max_seqlen_q <= 4096) && (true))) {
+                    using trait_ = fmha_fwd_traits_<128, FmhaFwdBf16, true, 64, 64, 32, 128, 32, 128, true, ck_tile::BlockFmhaPipelineEnum::QRKSVS_HPAD, false, ck_tile::SimplifiedGenericAttentionMask<false>, ck_tile::BlockAttentionBiasEnum::NO_BIAS, true, false, ck_tile::BlockAttentionQuantScaleEnum::NO_SCALE, true, true, true, true, false, false, false>;
+                    return fmha_fwd_<trait_, ck_tile::gfx12_t>(s, a);
+                }
+                else if((t.is_group_mode == true) && (t.is_v_rowmajor == true) && (t.has_logits_soft_cap == false) && (t.mask_type == mask_enum::no_mask) && (t.bias_type == bias_enum::alibi) && (t.has_lse == true)  && (t.has_dropout == false) && (t.qscale_type == quant_scale_enum::no_scale) && (t.skip_min_seqlen_q == false) &&(t.has_sink == false) &&
+                        (true/*group mode spad always true*/) && (true/*fall back to largest tile*/) && (true/*group mode skpad always true*/) && (a.hdim_q % 128 == 0) && (a.hdim_v % 128 == 0) && ((a.max_seqlen_q <= 4096) && (true))) {
+                    using trait_ = fmha_fwd_traits_<128, FmhaFwdBf16, true, 64, 64, 32, 128, 32, 128, true, ck_tile::BlockFmhaPipelineEnum::QRKSVS, false, ck_tile::SimplifiedGenericAttentionMask<false>, ck_tile::BlockAttentionBiasEnum::ALIBI, true, false, ck_tile::BlockAttentionQuantScaleEnum::NO_SCALE, true, true, false, false, false, false, false>;
+                    return fmha_fwd_<trait_, ck_tile::gfx12_t>(s, a);
+                }
+                else if((t.is_group_mode == true) && (t.is_v_rowmajor == true) && (t.has_logits_soft_cap == false) && (t.mask_type == mask_enum::no_mask) && (t.bias_type == bias_enum::alibi) && (t.has_lse == true)  && (t.has_dropout == false) && (t.qscale_type == quant_scale_enum::no_scale) && (t.skip_min_seqlen_q == false) &&(t.has_sink == false) &&
+                        (true/*group mode spad always true*/) && (true/*fall back to largest tile*/) && (true/*group mode skpad always true*/) && (a.hdim_q % 8 == 0) && (a.hdim_v % 8 == 0) && ((a.max_seqlen_q <= 4096) && (true))) {
+                    using trait_ = fmha_fwd_traits_<128, FmhaFwdBf16, true, 64, 64, 32, 128, 32, 128, true, ck_tile::BlockFmhaPipelineEnum::QRKSVS_HPAD, false, ck_tile::SimplifiedGenericAttentionMask<false>, ck_tile::BlockAttentionBiasEnum::ALIBI, true, false, ck_tile::BlockAttentionQuantScaleEnum::NO_SCALE, true, true, true, true, false, false, false>;
+                    return fmha_fwd_<trait_, ck_tile::gfx12_t>(s, a);
+                }
+                else if((t.is_group_mode == true) && (t.is_v_rowmajor == true) && (t.has_logits_soft_cap == false) && (t.mask_type != mask_enum::no_mask) && (t.bias_type == bias_enum::no_bias) && (t.has_lse == true)  && (t.has_dropout == false) && (t.qscale_type == quant_scale_enum::no_scale) && (t.skip_min_seqlen_q == false) &&(t.has_sink == false) &&
+                        (true/*group mode spad always true*/) && (true/*fall back to largest tile*/) && (true/*group mode skpad always true*/) && (a.hdim_q % 128 == 0) && (a.hdim_v % 128 == 0) && ((a.max_seqlen_q <= 4096) && (true))) {
+                    using trait_ = fmha_fwd_traits_<128, FmhaFwdBf16, true, 64, 64, 32, 128, 32, 128, true, ck_tile::BlockFmhaPipelineEnum::QRKSVS, false, ck_tile::SimplifiedGenericAttentionMask<true>, ck_tile::BlockAttentionBiasEnum::NO_BIAS, true, false, ck_tile::BlockAttentionQuantScaleEnum::NO_SCALE, true, true, false, false, false, false, false>;
+                    return fmha_fwd_<trait_, ck_tile::gfx12_t>(s, a);
+                }
+                else if((t.is_group_mode == true) && (t.is_v_rowmajor == true) && (t.has_logits_soft_cap == false) && (t.mask_type != mask_enum::no_mask) && (t.bias_type == bias_enum::no_bias) && (t.has_lse == true)  && (t.has_dropout == false) && (t.qscale_type == quant_scale_enum::no_scale) && (t.skip_min_seqlen_q == false) &&(t.has_sink == false) &&
+                        (true/*group mode spad always true*/) && (true/*fall back to largest tile*/) && (true/*group mode skpad always true*/) && (a.hdim_q % 8 == 0) && (a.hdim_v % 8 == 0) && ((a.max_seqlen_q <= 4096) && (true))) {
+                    using trait_ = fmha_fwd_traits_<128, FmhaFwdBf16, true, 64, 64, 32, 128, 32, 128, true, ck_tile::BlockFmhaPipelineEnum::QRKSVS_HPAD, false, ck_tile::SimplifiedGenericAttentionMask<true>, ck_tile::BlockAttentionBiasEnum::NO_BIAS, true, false, ck_tile::BlockAttentionQuantScaleEnum::NO_SCALE, true, true, true, true, false, false, false>;
+                    return fmha_fwd_<trait_, ck_tile::gfx12_t>(s, a);
+                }
+                else if((t.is_group_mode == true) && (t.is_v_rowmajor == true) && (t.has_logits_soft_cap == false) && (t.mask_type != mask_enum::no_mask) && (t.bias_type == bias_enum::alibi) && (t.has_lse == true)  && (t.has_dropout == false) && (t.qscale_type == quant_scale_enum::no_scale) && (t.skip_min_seqlen_q == false) &&(t.has_sink == false) &&
+                        (true/*group mode spad always true*/) && (true/*fall back to largest tile*/) && (true/*group mode skpad always true*/) && (a.hdim_q % 128 == 0) && (a.hdim_v % 128 == 0) && ((a.max_seqlen_q <= 4096) && (true))) {
+                    using trait_ = fmha_fwd_traits_<128, FmhaFwdBf16, true, 64, 64, 32, 128, 32, 128, true, ck_tile::BlockFmhaPipelineEnum::QRKSVS, false, ck_tile::SimplifiedGenericAttentionMask<true>, ck_tile::BlockAttentionBiasEnum::ALIBI, true, false, ck_tile::BlockAttentionQuantScaleEnum::NO_SCALE, true, true, false, false, false, false, false>;
+                    return fmha_fwd_<trait_, ck_tile::gfx12_t>(s, a);
+                }
+                else if((t.is_group_mode == true) && (t.is_v_rowmajor == true) && (t.has_logits_soft_cap == false) && (t.mask_type != mask_enum::no_mask) && (t.bias_type == bias_enum::alibi) && (t.has_lse == true)  && (t.has_dropout == false) && (t.qscale_type == quant_scale_enum::no_scale) && (t.skip_min_seqlen_q == false) &&(t.has_sink == false) &&
+                        (true/*group mode spad always true*/) && (true/*fall back to largest tile*/) && (true/*group mode skpad always true*/) && (a.hdim_q % 8 == 0) && (a.hdim_v % 8 == 0) && ((a.max_seqlen_q <= 4096) && (true))) {
+                    using trait_ = fmha_fwd_traits_<128, FmhaFwdBf16, true, 64, 64, 32, 128, 32, 128, true, ck_tile::BlockFmhaPipelineEnum::QRKSVS_HPAD, false, ck_tile::SimplifiedGenericAttentionMask<true>, ck_tile::BlockAttentionBiasEnum::ALIBI, true, false, ck_tile::BlockAttentionQuantScaleEnum::NO_SCALE, true, true, true, true, false, false, false>;
+                    return fmha_fwd_<trait_, ck_tile::gfx12_t>(s, a);
+                }
+                else if((t.is_group_mode == true) && (t.is_v_rowmajor == true) && (t.has_logits_soft_cap == false) && (t.mask_type == mask_enum::no_mask) && (t.bias_type == bias_enum::no_bias) && (t.has_lse == true)  && (t.has_dropout == false) && (t.qscale_type == quant_scale_enum::no_scale) && (t.skip_min_seqlen_q == false) &&(t.has_sink == false) &&
+                        (true/*group mode spad always true*/) && (true/*fall back to largest tile*/) && (true/*group mode skpad always true*/) && (a.hdim_q % 128 == 0) && (a.hdim_v % 128 == 0) && ((true) && (true))) {
+                    using trait_ = fmha_fwd_traits_<128, FmhaFwdBf16, true, 128, 64, 32, 128, 32, 128, true, ck_tile::BlockFmhaPipelineEnum::QRKSVS, false, ck_tile::SimplifiedGenericAttentionMask<false>, ck_tile::BlockAttentionBiasEnum::NO_BIAS, true, false, ck_tile::BlockAttentionQuantScaleEnum::NO_SCALE, true, true, false, false, false, false, false>;
+                    return fmha_fwd_<trait_, ck_tile::gfx12_t>(s, a);
+                }
+                else if((t.is_group_mode == true) && (t.is_v_rowmajor == true) && (t.has_logits_soft_cap == false) && (t.mask_type == mask_enum::no_mask) && (t.bias_type == bias_enum::no_bias) && (t.has_lse == true)  && (t.has_dropout == false) && (t.qscale_type == quant_scale_enum::no_scale) && (t.skip_min_seqlen_q == false) &&(t.has_sink == false) &&
+                        (true/*group mode spad always true*/) && (true/*fall back to largest tile*/) && (true/*group mode skpad always true*/) && (a.hdim_q % 8 == 0) && (a.hdim_v % 8 == 0) && ((true) && (true))) {
+                    using trait_ = fmha_fwd_traits_<128, FmhaFwdBf16, true, 128, 64, 32, 128, 32, 128, true, ck_tile::BlockFmhaPipelineEnum::QRKSVS_HPAD, false, ck_tile::SimplifiedGenericAttentionMask<false>, ck_tile::BlockAttentionBiasEnum::NO_BIAS, true, false, ck_tile::BlockAttentionQuantScaleEnum::NO_SCALE, true, true, true, true, false, false, false>;
+                    return fmha_fwd_<trait_, ck_tile::gfx12_t>(s, a);
+                }
+                else if((t.is_group_mode == true) && (t.is_v_rowmajor == true) && (t.has_logits_soft_cap == false) && (t.mask_type == mask_enum::no_mask) && (t.bias_type == bias_enum::alibi) && (t.has_lse == true)  && (t.has_dropout == false) && (t.qscale_type == quant_scale_enum::no_scale) && (t.skip_min_seqlen_q == false) &&(t.has_sink == false) &&
+                        (true/*group mode spad always true*/) && (true/*fall back to largest tile*/) && (true/*group mode skpad always true*/) && (a.hdim_q % 128 == 0) && (a.hdim_v % 128 == 0) && ((true) && (true))) {
+                    using trait_ = fmha_fwd_traits_<128, FmhaFwdBf16, true, 128, 64, 32, 128, 32, 128, true, ck_tile::BlockFmhaPipelineEnum::QRKSVS, false, ck_tile::SimplifiedGenericAttentionMask<false>, ck_tile::BlockAttentionBiasEnum::ALIBI, true, false, ck_tile::BlockAttentionQuantScaleEnum::NO_SCALE, true, true, false, false, false, false, false>;
+                    return fmha_fwd_<trait_, ck_tile::gfx12_t>(s, a);
+                }
+                else if((t.is_group_mode == true) && (t.is_v_rowmajor == true) && (t.has_logits_soft_cap == false) && (t.mask_type == mask_enum::no_mask) && (t.bias_type == bias_enum::alibi) && (t.has_lse == true)  && (t.has_dropout == false) && (t.qscale_type == quant_scale_enum::no_scale) && (t.skip_min_seqlen_q == false) &&(t.has_sink == false) &&
+                        (true/*group mode spad always true*/) && (true/*fall back to largest tile*/) && (true/*group mode skpad always true*/) && (a.hdim_q % 8 == 0) && (a.hdim_v % 8 == 0) && ((true) && (true))) {
+                    using trait_ = fmha_fwd_traits_<128, FmhaFwdBf16, true, 128, 64, 32, 128, 32, 128, true, ck_tile::BlockFmhaPipelineEnum::QRKSVS_HPAD, false, ck_tile::SimplifiedGenericAttentionMask<false>, ck_tile::BlockAttentionBiasEnum::ALIBI, true, false, ck_tile::BlockAttentionQuantScaleEnum::NO_SCALE, true, true, true, true, false, false, false>;
+                    return fmha_fwd_<trait_, ck_tile::gfx12_t>(s, a);
+                }
+                else if((t.is_group_mode == true) && (t.is_v_rowmajor == true) && (t.has_logits_soft_cap == false) && (t.mask_type != mask_enum::no_mask) && (t.bias_type == bias_enum::no_bias) && (t.has_lse == true)  && (t.has_dropout == false) && (t.qscale_type == quant_scale_enum::no_scale) && (t.skip_min_seqlen_q == false) &&(t.has_sink == false) &&
+                        (true/*group mode spad always true*/) && (true/*fall back to largest tile*/) && (true/*group mode skpad always true*/) && (a.hdim_q % 128 == 0) && (a.hdim_v % 128 == 0) && ((true) && (true))) {
+                    using trait_ = fmha_fwd_traits_<128, FmhaFwdBf16, true, 128, 64, 32, 128, 32, 128, true, ck_tile::BlockFmhaPipelineEnum::QRKSVS, false, ck_tile::SimplifiedGenericAttentionMask<true>, ck_tile::BlockAttentionBiasEnum::NO_BIAS, true, false, ck_tile::BlockAttentionQuantScaleEnum::NO_SCALE, true, true, false, false, false, false, false>;
+                    return fmha_fwd_<trait_, ck_tile::gfx12_t>(s, a);
+                }
+                else if((t.is_group_mode == true) && (t.is_v_rowmajor == true) && (t.has_logits_soft_cap == false) && (t.mask_type != mask_enum::no_mask) && (t.bias_type == bias_enum::no_bias) && (t.has_lse == true)  && (t.has_dropout == false) && (t.qscale_type == quant_scale_enum::no_scale) && (t.skip_min_seqlen_q == false) &&(t.has_sink == false) &&
+                        (true/*group mode spad always true*/) && (true/*fall back to largest tile*/) && (true/*group mode skpad always true*/) && (a.hdim_q % 8 == 0) && (a.hdim_v % 8 == 0) && ((true) && (true))) {
+                    using trait_ = fmha_fwd_traits_<128, FmhaFwdBf16, true, 128, 64, 32, 128, 32, 128, true, ck_tile::BlockFmhaPipelineEnum::QRKSVS_HPAD, false, ck_tile::SimplifiedGenericAttentionMask<true>, ck_tile::BlockAttentionBiasEnum::NO_BIAS, true, false, ck_tile::BlockAttentionQuantScaleEnum::NO_SCALE, true, true, true, true, false, false, false>;
+                    return fmha_fwd_<trait_, ck_tile::gfx12_t>(s, a);
+                }
+                else if((t.is_group_mode == true) && (t.is_v_rowmajor == true) && (t.has_logits_soft_cap == false) && (t.mask_type != mask_enum::no_mask) && (t.bias_type == bias_enum::alibi) && (t.has_lse == true)  && (t.has_dropout == false) && (t.qscale_type == quant_scale_enum::no_scale) && (t.skip_min_seqlen_q == false) &&(t.has_sink == false) &&
+                        (true/*group mode spad always true*/) && (true/*fall back to largest tile*/) && (true/*group mode skpad always true*/) && (a.hdim_q % 128 == 0) && (a.hdim_v % 128 == 0) && ((true) && (true))) {
+                    using trait_ = fmha_fwd_traits_<128, FmhaFwdBf16, true, 128, 64, 32, 128, 32, 128, true, ck_tile::BlockFmhaPipelineEnum::QRKSVS, false, ck_tile::SimplifiedGenericAttentionMask<true>, ck_tile::BlockAttentionBiasEnum::ALIBI, true, false, ck_tile::BlockAttentionQuantScaleEnum::NO_SCALE, true, true, false, false, false, false, false>;
+                    return fmha_fwd_<trait_, ck_tile::gfx12_t>(s, a);
+                }
+                else if((t.is_group_mode == true) && (t.is_v_rowmajor == true) && (t.has_logits_soft_cap == false) && (t.mask_type != mask_enum::no_mask) && (t.bias_type == bias_enum::alibi) && (t.has_lse == true)  && (t.has_dropout == false) && (t.qscale_type == quant_scale_enum::no_scale) && (t.skip_min_seqlen_q == false) &&(t.has_sink == false) &&
+                        (true/*group mode spad always true*/) && (true/*fall back to largest tile*/) && (true/*group mode skpad always true*/) && (a.hdim_q % 8 == 0) && (a.hdim_v % 8 == 0) && ((true) && (true))) {
+                    using trait_ = fmha_fwd_traits_<128, FmhaFwdBf16, true, 128, 64, 32, 128, 32, 128, true, ck_tile::BlockFmhaPipelineEnum::QRKSVS_HPAD, false, ck_tile::SimplifiedGenericAttentionMask<true>, ck_tile::BlockAttentionBiasEnum::ALIBI, true, false, ck_tile::BlockAttentionQuantScaleEnum::NO_SCALE, true, true, true, true, false, false, false>;
+                    return fmha_fwd_<trait_, ck_tile::gfx12_t>(s, a);
+                }
+
+            }
+
+        }
+
+    }
     else if(device_name.compare(0, 4, "gfx9") == 0) {
         if(t.data_type.compare("fp16") == 0) {
             if(t.hdim_q <= 128 && t.hdim_v <= 128) {

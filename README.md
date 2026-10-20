@@ -52,14 +52,15 @@ present on the build machine.
 
 Target architecture selection, in order of priority:
 
-1. `ROCM_TARGET_ARCH`, a comma-separated list, e.g. `ROCM_TARGET_ARCH=gfx90a,gfx1100`.
+1. `ROCM_TARGET_ARCH`, a comma-separated list, e.g. `ROCM_TARGET_ARCH=gfx90a,gfx1100,gfx1200,gfx1201`.
 2. Auto-detected via `rocminfo`, if available.
-3. Falls back to `gfx90a,gfx1100`.
+3. Falls back to `gfx90a,gfx1100,gfx1200,gfx1201`.
 
-Only the `gfx9` family (CDNA, e.g. `gfx90a`) and the `gfx11` family (RDNA3,
-e.g. `gfx1100`) have vendored kernel instantiations in `kernels/generated/`.
-Other architectures need the `composable_kernel` `generate.py` run manually,
-with the output added to `kernels/generated/` (see `kernels/README.md`).
+Only the `gfx9` family (CDNA, e.g. `gfx90a`), the `gfx11` family (RDNA3,
+e.g. `gfx1100`), and the `gfx12` family (RDNA4, `gfx1200` and `gfx1201`)
+have vendored kernel instantiations in `kernels/generated/`. Other
+architectures need the `composable_kernel` `generate.py` run manually, with
+the output added to `kernels/generated/` (see `kernels/README.md`).
 
 `CANDLE_FLASH_ATTN_ROCM_BUILD_DIR` can point `build.rs` at a persistent
 directory to cache compiled objects across builds, instead of `OUT_DIR`.

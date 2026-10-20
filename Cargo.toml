@@ -7,7 +7,7 @@ description = "FlashAttention for ROCm GPUs via AMD's Composable Kernel (CK), fo
 license = "MIT OR Apache-2.0"
 
 [dependencies]
-candle-core = { git = "https://github.com/xmiksay/candle", branch = "feat/rocm-backend", features = [
+candle-core = { git = "https://github.com/cryptomilk/candle", branch = "asn-feat-rocm-backend", features = [
     "rocm",
 ] }
 half = { version = "2.3.1", features = ["num-traits"] }
@@ -17,6 +17,6 @@ anyhow = { version = "1", features = ["backtrace"] }
 
 [dev-dependencies]
 anyhow = { version = "1", features = ["backtrace"] }
-candle-nn = { git = "https://github.com/xmiksay/candle", branch = "feat/rocm-backend", features = [
+candle-nn = { git = "https://github.com/cryptomilk/candle", branch = "asn-feat-rocm-backend", features = [
     "rocm",
 ] }
