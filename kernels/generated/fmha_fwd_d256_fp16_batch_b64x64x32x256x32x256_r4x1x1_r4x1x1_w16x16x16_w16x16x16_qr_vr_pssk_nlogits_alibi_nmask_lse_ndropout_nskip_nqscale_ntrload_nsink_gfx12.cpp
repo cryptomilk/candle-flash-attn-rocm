@@ -18,7 +18,8 @@ using fmha_shape = ck_tile::TileFmhaShape<fmha_block_tile,
                                           ck_tile::sequence<16, 16, 16>,
                                           ck_tile::sequence<4, 1, 1>,
                                           ck_tile::sequence<16, 16, 16>,
-                                          true>;
+                                          true,
+                                          false>;
 
 using fmha_traits = ck_tile::TileFmhaTraits<true,
                                             true,
@@ -55,7 +56,9 @@ using fmha_pipeline_problem = ck_tile::BlockFmhaPipelineProblem<
     fmha_variant,
     fmha_mask,
     false,
-    fmha_traits>;
+    fmha_traits,
+    false,
+    false>;
 
 using fmha_pipeline = ck_tile::BlockFmhaPipelineQRKSVS<
     fmha_pipeline_problem>;
@@ -69,15 +72,22 @@ using fmha_kernel = ck_tile::FmhaFwdKernel<fmha_pipeline, fmha_epilogue>;
 
 
 using trait = fmha_fwd_traits_<256, FmhaFwdFp16, false,64, 64, 32, 256, 32, 256, true,
-                        ck_tile::BlockFmhaPipelineEnum::QRKSVS, false, fmha_mask, ck_tile::BlockAttentionBiasEnum::ALIBI, true, false, ck_tile::BlockAttentionQuantScaleEnum::NO_SCALE, true, true, false, false, false, false, false>;
+                        ck_tile::BlockFmhaPipelineEnum::QRKSVS, false, fmha_mask, ck_tile::BlockAttentionBiasEnum::ALIBI, true, false, ck_tile::BlockAttentionQuantScaleEnum::NO_SCALE, true, true, false, false, false, false, false, -1>;
 
 template<>
 float fmha_fwd_<trait, ck_tile::gfx12_t>(const ck_tile::stream_config& s, fmha_fwd_args a)
 {
     using k_ = fmha_kernel;
+    if(a.selected_kernel_name != nullptr)
+        *a.selected_kernel_name = "fmha_fwd_d256_fp16_batch_b64x64x32x256x32x256_r4x1x1_r4x1x1_w16x16x16_w16x16x16_qr_vr_pssk_nlogits_alibi_nmask_lse_ndropout_nskip_nqscale_ntrload_nsink";
     if(s.log_level_ > 0)
         std::cout << ", fmha_fwd_d256_fp16_batch_b64x64x32x256x32x256_r4x1x1_r4x1x1_w16x16x16_w16x16x16_qr_vr_pssk_nlogits_alibi_nmask_lse_ndropout_nskip_nqscale_ntrload_nsink" << std::flush;
     auto [kargs, grids] = fmha_fwd_create_kargs_and_grids<k_>(a);
+    if(!k_::IsSupportedArgument(kargs))
+    {
+        ck_tile::CK_TILE_ERROR("Arguments not supported! Skipping fmha_fwd!");
+        return -1;
+    }
     const dim3 blocks                      = k_::BlockSize();
     constexpr ck_tile::index_t kBlockPerCu = k_::kBlockPerCu;
     return ck_tile::launch_kernel(s, ck_tile::make_kernel<kBlockPerCu, ck_tile::gfx12_t>(k_{}, grids, blocks, 0, kargs));

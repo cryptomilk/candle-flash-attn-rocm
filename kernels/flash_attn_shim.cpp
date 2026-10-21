@@ -62,7 +62,8 @@ fmha_fwd_args get_fwd_args(const mask_info& mask,
     const ck_tile::index_t batch_stride_lse =
         static_cast<ck_tile::index_t>(num_heads) * seqlen_q;
 
-    return fmha_fwd_args{q_ptr,
+    return fmha_fwd_args{nullptr, // selected_kernel_name
+                          q_ptr,
                           k_ptr,
                           v_ptr,
                           nullptr, // bias_ptr
@@ -183,7 +184,8 @@ fmha_fwd_args get_varlen_fwd_args(const mask_info& mask,
     // softmax_lse is (num_heads, total_q), row-major contiguous.
     const ck_tile::index_t nhead_stride_lse = total_q;
 
-    return fmha_fwd_args{q_ptr,
+    return fmha_fwd_args{nullptr, // selected_kernel_name
+                          q_ptr,
                           k_ptr,
                           v_ptr,
                           nullptr, // bias_ptr
@@ -281,7 +283,7 @@ float dispatch_head_grouped(const ck_tile::stream_config& sc,
         num_heads,
         num_heads_k,
         group_size,
-        false, // use_blockscale_qscale
+        false, // descale_varies_by_head
         [](const auto& grouped_traits, auto& grouped_args, const auto& grouped_sc) {
             return fmha_fwd(grouped_traits, grouped_args, grouped_sc);
         });
