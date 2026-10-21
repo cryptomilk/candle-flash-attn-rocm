@@ -19,6 +19,4 @@ anyhow = { version = "1", features = ["backtrace"] }
 
 [dev-dependencies]
 anyhow = { version = "1", features = ["backtrace"] }
-candle-nn = { git = "https://github.com/cryptomilk/candle", branch = "asn-feat-rocm-backend", features = [
-    "rocm",
-] }
+candle-nn = { git = "https://github.com/cryptomilk/candle-rocm", features = [ "rocm", ] }
