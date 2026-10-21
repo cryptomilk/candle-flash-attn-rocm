@@ -308,3 +308,23 @@ fn test_varlen_gqa_causal_f16() -> Result<()> {
 fn test_varlen_single_sequence_causal_f16() -> Result<()> {
     run_varlen_test(&[(64, 64)], 4, 4, 128, DType::F16, true, 1e-2)
 }
+
+/// MHA, causal, F16, head_dim = 256.
+#[test]
+fn test_causal_mha_f16_head_dim_256() -> Result<()> {
+    run_test(2, 32, 32, 4, 4, 256, DType::F16, true, 1e-2)
+}
+
+/// Varlen, differing sequence lengths, causal, F16, head_dim = 256.
+#[test]
+fn test_varlen_varying_lengths_causal_f16_head_dim_256() -> Result<()> {
+    run_varlen_test(
+        &[(16, 16), (48, 48), (8, 8)],
+        4,
+        4,
+        256,
+        DType::F16,
+        true,
+        1e-2,
+    )
+}

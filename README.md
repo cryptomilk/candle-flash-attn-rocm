@@ -69,8 +69,8 @@ directory to cache compiled objects across builds, instead of `OUT_DIR`.
 
 - Forward pass only. No backward or training support.
 - F16 and BF16 only; F32 tensors must be cast by the caller.
-- Head dimensions up to 256, a multiple of 8, but only `head_dim = 128` has
-  vendored kernel instantiations right now. Other head dims need
-  regenerating `kernels/generated/` (see `kernels/README.md`).
+- Head dimensions up to 256, a multiple of 8, but only `head_dim = 128` and
+  `head_dim = 256` have vendored kernel instantiations right now. Other head
+  dims need regenerating `kernels/generated/` (see `kernels/README.md`).
 - No ALiBi or KV-cache Rust entry points yet, though the vendored CK kernel
   instantiations already include ALiBi variants for a future `flash_attn_alibi`.
