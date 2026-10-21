@@ -9,9 +9,7 @@ authors = ["Andreas Schneider <asn@cryptomilk.org>"]
 readme = "README.md"
 
 [dependencies]
-candle-core = { git = "https://github.com/cryptomilk/candle", branch = "asn-feat-rocm-backend", features = [
-    "rocm",
-] }
+candle-core = { git = "https://github.com/cryptomilk/candle-rocm", features = [ "rocm", ] }
 half = { version = "2", features = ["num-traits"] }
 
 [build-dependencies]

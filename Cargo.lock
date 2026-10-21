@@ -128,39 +128,10 @@ checksum = "1fd0f2584146f6f2ef48085050886acf353beff7305ebd1ae69500e27c67f64b"
 [[package]]
 name = "candle-core"
 version = "0.11.0"
-source = "git+https://github.com/cryptomilk/candle?branch=asn-feat-rocm-backend#148115b74aa83999a5a7b8d284cc5d37e104761c"
-dependencies = [
- "byteorder",
- "candle-rocm-kernels 0.11.0 (git+https://github.com/cryptomilk/candle?branch=asn-feat-rocm-backend)",
- "float8",
- "gemm",
- "half",
- "libc",
- "libloading",
- "libm",
- "memmap2",
- "num-traits",
- "num_cpus",
- "parking_lot",
- "rand",
- "rand_distr",
- "rayon",
- "rocm-rs",
- "safetensors",
- "thiserror 2.0.21",
- "tokenizers",
- "yoke",
- "zerocopy",
- "zip",
-]
-
-[[package]]
-name = "candle-core"
-version = "0.11.0"
 source = "git+https://github.com/cryptomilk/candle-rocm#148115b74aa83999a5a7b8d284cc5d37e104761c"
 dependencies = [
  "byteorder",
- "candle-rocm-kernels 0.11.0 (git+https://github.com/cryptomilk/candle-rocm)",
+ "candle-rocm-kernels",
  "float8",
  "gemm",
  "half",
@@ -188,7 +159,7 @@ name = "candle-flash-attn-rocm"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "candle-core 0.11.0 (git+https://github.com/cryptomilk/candle?branch=asn-feat-rocm-backend)",
+ "candle-core",
  "candle-nn",
  "half",
 ]
@@ -198,27 +169,14 @@ name = "candle-nn"
 version = "0.11.0"
 source = "git+https://github.com/cryptomilk/candle-rocm#148115b74aa83999a5a7b8d284cc5d37e104761c"
 dependencies = [
- "candle-core 0.11.0 (git+https://github.com/cryptomilk/candle-rocm)",
- "candle-rocm-kernels 0.11.0 (git+https://github.com/cryptomilk/candle-rocm)",
+ "candle-core",
+ "candle-rocm-kernels",
  "half",
  "libc",
  "num-traits",
  "rayon",
  "safetensors",
  "serde",
- "thiserror 2.0.21",
-]
-
-[[package]]
-name = "candle-rocm-kernels"
-version = "0.11.0"
-source = "git+https://github.com/cryptomilk/candle?branch=asn-feat-rocm-backend#148115b74aa83999a5a7b8d284cc5d37e104761c"
-dependencies = [
- "dirs",
- "fslock",
- "libloading",
- "rocm-rs",
- "sha2",
  "thiserror 2.0.21",
 ]
 
