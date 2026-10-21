@@ -5,12 +5,14 @@ edition = "2024"
 
 description = "FlashAttention for ROCm GPUs via AMD's Composable Kernel (CK), for the candle ML framework."
 license = "MIT OR Apache-2.0"
+authors = ["Andreas Schneider <asn@cryptomilk.org>"]
+readme = "README.md"
 
 [dependencies]
 candle-core = { git = "https://github.com/cryptomilk/candle", branch = "asn-feat-rocm-backend", features = [
     "rocm",
 ] }
-half = { version = "2.3.1", features = ["num-traits"] }
+half = { version = "2", features = ["num-traits"] }
 
 [build-dependencies]
 anyhow = { version = "1", features = ["backtrace"] }
